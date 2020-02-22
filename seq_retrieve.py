@@ -5,6 +5,7 @@ from pathlib import Path
 
 
 def parse_arguments(parser=None): 
+    """Parse arguments given by the terminal for PDB ID."""
     if not parser: 
         parser = ap.ArgumentParser()
     parser.add_argument("id_input", help="Input PDB ID")
