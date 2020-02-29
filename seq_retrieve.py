@@ -14,6 +14,14 @@ def parse_arguments(parser=None):
     return args
 
 def struct_seq_retrieve(args): 
+    """
+    Retrieve PDB structure given the PDB Id.
+    
+    Args
+        PDB ID
+    Returns 
+        PDB structure file
+    """
     Pdb_id = args.id_input
     pdbl = PDBList()
     ppb = PPBuilder()
@@ -24,6 +32,13 @@ def struct_seq_retrieve(args):
     print("PDB file written.")
 
 def seq_extract(args): 
+    """
+    Once the PDB structure is retrieved, retrieve sequence.
+    Args: 
+        PDB ID input
+    Returns
+        Seq file
+    """
     pdb_file = f"{args.id_input}.pdb"
     ppb = PPBuilder()
     p = PDBParser()
