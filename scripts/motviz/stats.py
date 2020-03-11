@@ -43,5 +43,8 @@ np_seq = np.array([np.array(y, dtype=object) for y in seq], dtype=object)
 
 # possibly numpy problem? 
 
-print(np_seq)
+#print(np_seq)
 print(np_seq[0].shape)
+
+ver = vert_seq(np_seq)
+print(ver)
