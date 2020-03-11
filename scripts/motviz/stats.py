@@ -1,36 +1,27 @@
 
-
 import numpy as np
+from Bio import SeqIO
 
 def seq_extract(in_file): 
+    record = SeqIO.parse(in_file, "fasta")
     seqs = []
-    
-    with open(in_file, "r") as f: 
-        seqs = []
-        for line in f: 
-            line = line.rstrip("\n")
-            line_list = list(line)
-            if ">" not in line: 
-                seqs.append(line_list)    
-        return seqs
-    
+    for i in record: 
+        seqs.append(i.seq)
+        
+    return seqs
+
 def seq2np(seqs): 
     return np.array(seq)
 
 def vert_seq(np_seq): 
     def _per_column(array): 
-        # print(f"array {array}")
-        trans = array
-        # print(f"trans {trans}")
-        return trans
-    new_ar =  np.apply_along_axis(_per_column, 0, np_seq)
-    
-    return new_ar
+        return array
+
+    return np.apply_along_axis(_per_column, 0, np_seq)
     
 seq = seq_extract("/home/nadzhou/Desktop/navid.fasta")
 
-np_seq = np.array(seq, dtype=object)
 
-vert_seq1 = vert_seq(np_seq)
+np_seq = np.array([np.array(y) for y in seq])
 
-print(vert_seq1)
+print(np_seq[0: ][0])
