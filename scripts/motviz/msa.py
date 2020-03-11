@@ -9,7 +9,7 @@ def msa(in_file):
         Fasta file"""
 
         
-    out_file = "aligned1.fasta"
+    out_file = str("/home/nadzhou/Desktop/aligned1.fasta")
 
     clustalomega_cline = ClustalOmegaCommandline(infile=in_file, \
                         outfile=out_file, verbose=True)
@@ -21,7 +21,7 @@ def msa(in_file):
     r = subprocess.Popen(cmd_str)
     if (r.communicate()): 
         print("\n Clustal Omega done")
-        print(f"File written at: {out_file} ")
+        print("File written.")
 
 
-msa("navid.fasta")
+msa(str("/home/nadzhou/Desktop/navid.fasta"))

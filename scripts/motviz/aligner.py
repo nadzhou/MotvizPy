@@ -20,9 +20,9 @@ def xml_parser(in_file):
     for hsp in blast_records.hsps: 
         print(hsp.hit)
         seqs.append(hsp.hit)
-        
-    SeqIO.write(seqs, "navid.fasta", "fasta")
+          
+    SeqIO.write(seqs[:50], "navid.fasta", "fasta")
 
 
-xml_parser("out_psi.xml")
+xml_parser("/home/nadzhou/blastdb/refseq_protein.00/out_psi.xml")
     

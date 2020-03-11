@@ -6,27 +6,25 @@ def seq_extract(in_file):
     seqs = []
     
     with open(in_file, "r") as f: 
- 
+        seqs = []
         for line in f: 
             line = line.rstrip("\n")
             if ">" not in line: 
-                seqs.append(list(line))        
+                seqs.append(np.array(list(line), dtype=object))    
+        seqs = [[i for i in j] for j in seqs]
         return seqs
 
-def seq2np(seq): 
-    return np.array(seq, dtype=object)
 
-def vert_seq_parser(np_seq):     
+def vert_seq_parser(np_seq):    
+    whole_seq = np.array(np_seq, dtype=object)
+    print(whole_seq.ndim)    
     def _vert_seq(array): 
 
         return array
-    r =  np.apply_along_axis(_vert_seq, 0, np_seq)   
-    print(r)
+    r =  np.apply_along_axis(_vert_seq, 0, whole_seq)   
+    print(r[0])
 
     
 ar = seq_extract("/home/nadzhou/blastdb/refseq_protein.00/aligned1.fasta")
 
-s = seq2np(ar)
-
-vert_seq_parser(s)
-
+vert_seq_parser(ar)
