@@ -22,6 +22,6 @@ def vert_seq(np_seq):
 seq = seq_extract("/home/nadzhou/Desktop/navid.fasta")
 
 
-np_seq = np.array([np.array(y) for y in seq])
+np_seq = np.array([np.array(y, dtype=object) for y in seq], dtype=object)
 
-print(np_seq[0: ][0])
+print(np_seq.ndim)
