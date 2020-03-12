@@ -24,4 +24,4 @@ def msa(in_file):
         print("File written.")
 
 
-msa(str("/home/nadzhou/Desktop/navid.fasta"))
+msa(str("navid.fasta"))
