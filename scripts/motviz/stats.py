@@ -4,6 +4,8 @@ from Bio import SeqIO
 import math
 import matplotlib.pyplot as plt
 import seaborn as sns
+from scipy.stats import chi2 
+from scipy.stats import chi2
 
 def seq_extract(in_file): 
     """Extrct the sequence from the fasta file
@@ -18,7 +20,8 @@ def seq_extract(in_file):
         seqs.append(str(i.seq))
     return seqs
 class Analysis: 
-    """Class to analyze the multiple sequence alignment. 
+    """
+    Class to analyze the multiple sequence alignment. 
     Implements the Shannon Entropy, chi-squared and 
     per-column variation analysis algorithms. 
     """        
@@ -79,7 +82,11 @@ class Analysis:
         return (2.*(ent_list - \
             np.min(ent_list))/np.ptp(ent_list)-1)       
         
-
+    def apply_chisquare(self, norm_list): 
+        return chi2(norm_list)
+    # def motif_extract(self): 
+    #     for i in range(len(self.ent_list)): 
+    #         if self.ent_list[i - 4 : i + 4] > 
         
         
 seq = seq_extract("/home/nadzhou/Desktop/aligned1.fasta")
@@ -90,5 +97,11 @@ c = Analysis(seq)
 c_ent = c.conservation_score()
 a = c.normalize_data(c_ent)
 a_len = [x for x in range(len(a))]
+
+# norm = c.apply_chisquare(a)
+# norm2 = chi2(norm)
+
+# print(norm2)
+
 sns.lineplot(x=a_len, y=a)
 plt.show()
