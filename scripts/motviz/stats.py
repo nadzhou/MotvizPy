@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+
 
 import numpy as np
 from Bio import SeqIO
 import math
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy.stats import chi2 
+from scipy.signal import argrelextrema
 from scipy.stats import chi2
 
 def seq_extract(in_file): 
@@ -84,10 +86,17 @@ class Analysis:
         
     def apply_chisquare(self, norm_list): 
         return chi2(norm_list)
-    # def motif_extract(self): 
-    #     for i in range(len(self.ent_list)): 
-    #         if self.ent_list[i - 4 : i + 4] > 
+    
+    def find_local_minima(self, data): 
+        local_minima = argrelextrema(data, np.less)
+        real_local = []
         
+        data_mean = np.mean(data)
+        for i in range(len(local_minima)): 
+            if data[i] < data_mean: 
+                real_local.append(local_minima[i])
+                
+        return real_local
         
 seq = seq_extract("/home/nadzhou/Desktop/aligned1.fasta")
 seq = [[x for x in y] for y in seq]
@@ -97,11 +106,14 @@ c = Analysis(seq)
 c_ent = c.conservation_score()
 a = c.normalize_data(c_ent)
 a_len = [x for x in range(len(a))]
-
+l = c.find_local_minima(a)
+print(l)
 # norm = c.apply_chisquare(a)
 # norm2 = chi2(norm)
 
 # print(norm2)
 
 sns.lineplot(x=a_len, y=a)
+plt.xlabel("Amino acid position")
+plt.ylabel("Normalized score")
 plt.show()
