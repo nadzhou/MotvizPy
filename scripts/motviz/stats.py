@@ -88,15 +88,27 @@ class Analysis:
         return chi2(norm_list)
     
     def find_local_minima(self, data): 
-        local_minima = argrelextrema(data, np.less)
-        real_local = []
+        """
+        Find the local minima of the given data
+        and then only return a list of values that is 
+        less than the mean of the data set. 
         
+        Args: 
+            Normalized np array [nd array]
+        Returns: 
+            Local minma less than mean [list]
+        """
+        
+        local_minima = argrelextrema(data, np.less)
         data_mean = np.mean(data)
-        for i in range(len(local_minima)): 
-            if data[i] < data_mean: 
-                real_local.append(local_minima[i])
+        polished_minima = []
+        for i in local_minima: 
+            for j in i: 
+                if data[j] < data_mean: 
+                    polished_minima.append(j)
+        
+        return polished_minima
                 
-        return real_local
         
 seq = seq_extract("/home/nadzhou/Desktop/aligned1.fasta")
 seq = [[x for x in y] for y in seq]
@@ -107,13 +119,7 @@ c_ent = c.conservation_score()
 a = c.normalize_data(c_ent)
 a_len = [x for x in range(len(a))]
 l = c.find_local_minima(a)
-print(l)
-# norm = c.apply_chisquare(a)
-# norm2 = chi2(norm)
 
-# print(norm2)
-
-sns.lineplot(x=a_len, y=a)
-plt.xlabel("Amino acid position")
-plt.ylabel("Normalized score")
+sns.distplot(a, a_len)
+sns.distplot(a[l], l)
 plt.show()
