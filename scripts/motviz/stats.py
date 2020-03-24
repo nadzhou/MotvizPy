@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3.7
 
 
 import numpy as np
 from Bio import SeqIO
 import math
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plta
 import seaborn as sns
 from scipy.signal import argrelextrema
 from scipy.stats import chi2
@@ -108,7 +108,31 @@ class Analysis:
                     polished_minima.append(j)
         
         return polished_minima
-                
+
+    def find_motif(self, data, minima): 
+        """
+        In a given stretch of 4 word size,, find possible motifs
+        by seeing if all the values are less than a threshold, which 
+        is 1/4th of the mean of the normalized data. 
+        
+        Args; 
+            Normalized data [nd array]
+            Local minima [nd array]
+            
+        Returns: 
+            List of possible motifs [list]
+        """
+        
+        pos_motif = []
+        threshold = float(np.mean(data)/4)
+        for i in minima: 
+            motif_stretch = data[i : i + 4]
+            if np.all(motif_stretch < threshold): 
+               pos_motif.append(motif_stretch[0])
+               
+        #pos_motif = [x for sub in pos_motif for x in sub]
+        
+        return pos_motif
         
 seq = seq_extract("/home/nadzhou/Desktop/aligned1.fasta")
 seq = [[x for x in y] for y in seq]
@@ -116,10 +140,14 @@ seq = [[x for x in y] for y in seq]
 c = Analysis(seq)
 
 c_ent = c.conservation_score()
-a = c.normalize_data(c_ent)
-a_len = [x for x in range(len(a))]
-l = c.find_local_minima(a)
+norm_data = c.normalize_data(c_ent)
+norm_data_len = [x for x in range(len(norm_data))]
+minima = c.find_local_minima(norm_data)
 
-sns.distplot(a, a_len)
-sns.distplot(a[l], l)
-plt.show()
+pos_motif = c.find_motif(norm_data, minima)
+
+for i in pos_motif: 
+    print(i)
+# sns.distplot(a, a_len)
+# sns.distplot(a[l], l)
+# plt.show()
