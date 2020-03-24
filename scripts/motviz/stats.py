@@ -135,6 +135,31 @@ class Analysis:
                     pos.append(i)
                        
         return (pos_motif, pos)
+    
+    def pymol_script_writer(self, pos): 
+        """
+        Given the positions of the motifs, function 
+        writes a PyMol script which can then be executed
+        on the program as follows: @pymol_script.txt
+        
+        Args: 
+            Positions of the motifs [list]
+        Returns: 
+            Txt output file [txt]
+        """
+        
+        with open("/home/nadzhou/Desktop/pymol_script.txt", "w") as file: 
+            file.write(f"fetch 1xef\n")
+            for i in range(len(pos)): 
+                file.write(f"create mot{pos[i]}, resi {pos[i]}-{pos[i]+4} \n")
+                
+            file.write("\nhide_all\n")
+            file.write("\n")
+            for i in range(len(pos)): 
+                file.write(f"show cartoon, resi{pos[i]}\n")
+            file.write("\n")
+            for i in range(len(pos)): 
+                file.write(f"color red, mot{pos[i]}\n")
         
 seq = seq_extract("/home/nadzhou/Desktop/clustal.fasta")
 seq = [[x for x in y] for y in seq]
@@ -148,6 +173,10 @@ minima = c.find_local_minima(norm_data)
 
 pos_motif, pos = c.find_motif(norm_data, minima)
 
-print(pos)
-sns.lineplot(x=norm_data_len, y=norm_data)
-plt.show()
+c.pymol_script_writer(pos)
+
+# print(pos)
+# sns.lineplot(x=norm_data_len, y=norm_data)
+# plt.xlabel("Amino acid position")
+# plt.ylabel("Conservation score")
+# plt.show()
