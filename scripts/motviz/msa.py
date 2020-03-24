@@ -9,7 +9,7 @@ def msa(in_file):
         Fasta file"""
 
         
-    out_file = str("/home/nadzhou/Desktop/aligned1.fasta")
+    out_file = str("/home/nadzhou/Desktop/clustal.fasta")
 
     clustalomega_cline = ClustalOmegaCommandline(infile=in_file, \
                         outfile=out_file, verbose=True)
@@ -24,4 +24,4 @@ def msa(in_file):
         print("File written.")
 
 
-msa(str("navid.fasta"))
+msa(str("/home/nadzhou/Desktop/navid.fasta"))

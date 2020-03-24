@@ -30,4 +30,4 @@ def psi_blaster(in_file):
 
     print("PSI-BLAST done. File written out_psi.xml")
         
-psi_blaster("./4xey.fasta")
+psi_blaster("./1xef.fasta")

@@ -4,7 +4,7 @@
 import numpy as np
 from Bio import SeqIO
 import math
-import matplotlib.pyplot as plta
+import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.signal import argrelextrema
 from scipy.stats import chi2
@@ -124,17 +124,19 @@ class Analysis:
         """
         
         pos_motif = []
-        threshold = float(np.mean(data)/4)
+        pos = []
+        threshold = float(np.mean(data)/2)
         for i in minima: 
-            motif_stretch = data[i : i + 4]
-            if np.all(motif_stretch < threshold): 
-               pos_motif.append(motif_stretch[0])
-               
-        #pos_motif = [x for sub in pos_motif for x in sub]
+            if i - 4 > 0: 
+                motif_stretch = data[i : i + 2]
+                if np.all(motif_stretch < threshold): 
+                    # Take the first value. 
+                    pos_motif.append(motif_stretch[0])
+                    pos.append(i)
+                       
+        return (pos_motif, pos)
         
-        return pos_motif
-        
-seq = seq_extract("/home/nadzhou/Desktop/aligned1.fasta")
+seq = seq_extract("/home/nadzhou/Desktop/clustal.fasta")
 seq = [[x for x in y] for y in seq]
 
 c = Analysis(seq)
@@ -144,10 +146,8 @@ norm_data = c.normalize_data(c_ent)
 norm_data_len = [x for x in range(len(norm_data))]
 minima = c.find_local_minima(norm_data)
 
-pos_motif = c.find_motif(norm_data, minima)
+pos_motif, pos = c.find_motif(norm_data, minima)
 
-for i in pos_motif: 
-    print(i)
-# sns.distplot(a, a_len)
-# sns.distplot(a[l], l)
-# plt.show()
+print(pos)
+sns.lineplot(x=norm_data_len, y=norm_data)
+plt.show()

@@ -24,5 +24,5 @@ def xml_parser(in_file):
     SeqIO.write(seqs[:100], "navid.fasta", "fasta")
 
 
-xml_parser("/home/nadzhou/blastdb/refseq_protein.00/out_psi.xml")
+xml_parser("/home/nadzhou/Desktop/out_psi.xml")
     
