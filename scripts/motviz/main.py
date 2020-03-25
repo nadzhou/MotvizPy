@@ -9,6 +9,9 @@ from motvizpy.stats import seq_extract
 from motvizpy.stats import Analysis
 from pathlib import Path
 
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 path = Path(("/home/nadzhou/Desktop/navid"))
 
 pdb_id = parse_arguments()
@@ -32,6 +35,12 @@ norm_data = c.normalize_data(c_ent)
 norm_data_len = [x for x in range(len(norm_data))]
 minima = c.find_local_minima(norm_data)
 
-print(norm_data)
-pos_motif, pos = c.find_motif(norm_data, minima)
-c.pymol_script_writer(f"{path}/mol.txt", pos)
+norm_len = [x for x in range(len(norm_data))]
+
+# c.pymol_script_writer(f"{path}/mol.txt", pos)
+
+sns.lineplot(x=norm_len, y=norm_data)
+plt.title("Conservation score per amino acid position")
+plt.xlabel("Amino acid position")
+plt.ylabel("Normalized conservation score")
+plt.show()
