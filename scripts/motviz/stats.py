@@ -7,96 +7,122 @@ import math
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.signal import argrelextrema
-from scipy.stats import chi2
+from pathlib import Path
 
 def seq_extract(in_file): 
     """Extrct the sequence from the fasta file
+    
     Args: 
-        input file [str]
-    REturns: 
-        Sequence [1d list]
+        in_file [str]: Input file address
+        
+    Returns: 
+        seqs [1d list]: Protein sequences lisst
+        
     """
     record = SeqIO.parse(in_file, "fasta")
-    seqs = []
-    for i in record: 
-        seqs.append(str(i.seq))
+    seqs = [i.seq for i in record]
     return seqs
+
 class Analysis: 
-    """
-    Class to analyze the multiple sequence alignment. 
-    Implements the Shannon Entropy, chi-squared and 
-    per-column variation analysis algorithms. 
-    """        
-    def __init__(self, seq): 
-        """
-        Initialize class Analysis. 
+    """Class will calculate conservation, visualize, and write PyMol script.
+    
+    Args: 
+        seq [1d list]: Sequences of amino acids from fasta file 
+    
+    """  
+    def seq2np(self, seq): 
+        """"Turn the sequence into numpy S1 array for calculations later. 
         
         Args: 
-            Sequence list [list of lists]
-            
-        Returns: 
-            Conservation score 
-            Chi-squared table 
-            etc etc
-        """
-        def seq2np(seq): 
-            return np.asarray(seq, dtype=object)
+            seq [2d list]: List of lists that contain sequences 
         
-        np_seq = seq2np(seq)
+        Returns: 
+            np array [2d np array]: Np array that turns the chars into bytes
+            
+        """
+        
+        return np.asarray(seq, dtype='S1')
+              
+    def __init__(self, seq): 
+        """Initialize class Analysis. 
+        
+        Convert the 2d list to np array and make accessible
+        globally for other other functions. 
+        
+        Args: 
+            seq [list of lists]: 2d list of sequences
+            
+        """   
+        np_seq = self.seq2np(seq)
         self.seq = seq
         self.np_seq = np_seq   
-    
-
-    def conservation_score(self): 
+            
+    def _shannon(self, array): 
+        """Calculate Shannon Entropy vertically via loop. 
+        
+        Args: 
+            array [nd array]: 1d array of sequences from all the species
+        
+        Returns: 
+            entropy [nd float array]: Per column value for each position vertically
+        
         """
-        Calculate the Shannon Entropy vertically
+        
+        array = str(array)
+        entropy = 0 
+        
+        for x in array: 
+            char_count = np.char.count(array, sub=x)
+
+            if x == "-": 
+                # Penalize columns with all - values
+                p_x = float(char_count/len(array)*2) 
+                
+            else: p_x = float(char_count/len(array))
+            
+            if p_x > 0: 
+                entropy += (- p_x*math.log(p_x, 2)/20)
+        return entropy
+        
+    def conservation_score(self): 
+        """Calculate the Shannon Entropy vertically
         for each position in the amino acid msa sequence.
         
         Args: 
-            Numpy sequence [nd array]
+            np_seq [Numpy nd array]: Np array of sequences
+            
         Returns: 
-            Vertical-orientation conservation score [nd array]    
+            np apply array [nd float array]: Calculate conservation 
+            scores vertically into a float nd array   
         """
-
-        def _shannon(array): 
-            array = str(array)
-            entropy = 0 
-            for x in array: 
-                char_count = np.char.count(array, sub=x)
-
-                if x == "-": 
-                    p_x = float(char_count/len(array)*2) 
-                    
-                else: p_x = float(char_count/len(array))
-                if p_x > 0: 
-                    entropy += (- p_x*math.log(p_x, 2)/20)
-            return entropy
-        return np.apply_along_axis(_shannon, 0, self.np_seq)      
+        
+        return np.apply_along_axis(self._shannon, 0, self.np_seq)      
 
     def normalize_data(self, ent_list): 
         """Takes the entropy array and normalizes the data. 
         
         Args: 
-            Shannon Entropy array [numpy ndarray]
+            ent_list [Nd array]: Entropy float array
+            
         Returns: 
-            Normalized numpy array [numpy ndarray]
+            Normalized list [nd array]: Values between -1 and 1
+            
         """
+        
         return (2.*(ent_list - \
             np.min(ent_list))/np.ptp(ent_list)-1)       
         
-    def apply_chisquare(self, norm_list): 
-        return chi2(norm_list)
     
     def find_local_minima(self, data): 
-        """
-        Find the local minima of the given data
-        and then only return a list of values that is 
-        less than the mean of the data set. 
+        """Find local minima that are lower than mean of data
         
         Args: 
-            Normalized np array [nd array]
+            data [nd float array]: Normalized conservation data
+            
         Returns: 
-            Local minma less than mean [list]
+            polished_minima [list]: List that contains minima 
+            lower than the mean.
+            
         """
         
         local_minima = argrelextrema(data, np.less)
@@ -110,17 +136,19 @@ class Analysis:
         return polished_minima
 
     def find_motif(self, data, minima): 
-        """
-        In a given stretch of 4 word size,, find possible motifs
-        by seeing if all the values are less than a threshold, which 
-        is 1/4th of the mean of the normalized data. 
+        """Given the minima and data, look for consecutive
+        set (word size of 4) of values that are 1/4th of the mean. 
         
         Args; 
-            Normalized data [nd array]
-            Local minima [nd array]
-            
+            data [nd float array]: Normalized conservation data
+            minima [1d list]: List of minima lower than the mean 
+                        
         Returns: 
-            List of possible motifs [list]
+            pos_motif [1d list]: Possible motifs that have 4 consecutive 
+                lower scores than 1/4th of the mean, only the 1st index. 
+                
+            pos [1d list]: Positions of these motifs.        
+             
         """
         
         pos_motif = []
@@ -128,7 +156,7 @@ class Analysis:
         threshold = float(np.mean(data)/2)
         for i in minima: 
             if i - 4 > 0: 
-                motif_stretch = data[i : i + 2]
+                motif_stretch = data[i - 1 : i + 1]
                 if np.all(motif_stretch < threshold): 
                     # Take the first value. 
                     pos_motif.append(motif_stretch[0])
@@ -136,19 +164,19 @@ class Analysis:
                        
         return (pos_motif, pos)
     
-    def pymol_script_writer(self, pos): 
-        """
-        Given the positions of the motifs, function 
-        writes a PyMol script which can then be executed
-        on the program as follows: @pymol_script.txt
+    def pymol_script_writer(self, out_file, pos): 
+        """Motifs that are found are then written a txt file.
+        Thhis is then run on PyMol by typing the following on terminal: 
+            @pymol_script.txt 
         
         Args: 
-            Positions of the motifs [list]
-        Returns: 
-            Txt output file [txt]
+            out_file [str]: Address for where the file should be written
+            pos [1d list]: Posiitons of the motifs as list
+            
         """
         
-        with open("/home/nadzhou/Desktop/pymol_script.txt", "w") as file: 
+        path = Path(out_file)
+        with open(path, "w") as file: 
             file.write(f"fetch 1xef\n")
             for i in range(len(pos)): 
                 file.write(f"create mot{pos[i]}, resi {pos[i]}-{pos[i]+4} \n")
@@ -161,22 +189,21 @@ class Analysis:
             for i in range(len(pos)): 
                 file.write(f"color red, mot{pos[i]}\n")
         
-seq = seq_extract("/home/nadzhou/Desktop/clustal.fasta")
-seq = [[x for x in y] for y in seq]
 
-c = Analysis(seq)
+def main(): 
+    seq = seq_extract("/home/nadzhou/Desktop/clustal.fasta")
+    seq = [[x for x in y] for y in seq]
 
-c_ent = c.conservation_score()
-norm_data = c.normalize_data(c_ent)
-norm_data_len = [x for x in range(len(norm_data))]
-minima = c.find_local_minima(norm_data)
+    c = Analysis(seq)
 
-pos_motif, pos = c.find_motif(norm_data, minima)
+    c_ent = c.conservation_score()
+    norm_data = c.normalize_data(c_ent)
+    norm_data_len = [x for x in range(len(norm_data))]
+    minima = c.find_local_minima(norm_data)
 
-c.pymol_script_writer(pos)
+    print(norm_data)
+    pos_motif, pos = c.find_motif(norm_data, minima)
+    
+if __name__ == "__main__": 
+    main()
 
-# print(pos)
-# sns.lineplot(x=norm_data_len, y=norm_data)
-# plt.xlabel("Amino acid position")
-# plt.ylabel("Conservation score")
-# plt.show()
