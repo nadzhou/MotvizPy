@@ -6,7 +6,7 @@ from Bio import SearchIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
-def xml_parser(in_file): 
+def xml_parser(in_file, out_file): 
     """Parse the XML file and then give 
     out top 100 sequences into a fasta file. 
 
@@ -23,7 +23,7 @@ def xml_parser(in_file):
         print(hsp.hit)
         seqs.append(hsp.hit)
           
-    return SeqIO.write(seqs[:100], "navid.fasta", "fasta")
+    return SeqIO.write(seqs[:100], out_file, "fasta")
 
 
     

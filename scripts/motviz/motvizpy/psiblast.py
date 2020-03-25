@@ -3,7 +3,7 @@
 from Bio.Blast.Applications import NcbipsiblastCommandline
 import subprocess
 
-def psi_blaster(in_file):
+def psi_blaster(in_file, out_file):
     """Perform a PSI-BLAST via the refseq-protein.00
     database available locally and then get XML output. 
     
@@ -20,7 +20,7 @@ def psi_blaster(in_file):
 
     cline = NcbipsiblastCommandline(query = in_file, outfmt = 5, 
                                 db = "refseq_protein.00", 
-                                out="/home/nadzhou/Desktop/out_psi.xml")
+                                out=out_file)
 
     cmd = str(cline)
     cmd = cmd.split(" ")
@@ -28,5 +28,5 @@ def psi_blaster(in_file):
     r = subprocess.Popen(cmd)
     
     if r.communicate(): 
-        return ("PSI-BLAST done. File written out_psi.xml")
+        return ("PSI-BLAST done. File written {out_file}")
         

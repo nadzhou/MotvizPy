@@ -28,14 +28,16 @@ def parse_arguments(parser=None):
 class StructSeqRetrieve: 
     """Retrieve both PDB structure and then its sequence """
     
-    def __init__(self, args): 
+    def __init__(self, args, out_directory): 
         """Initialize the class StructSeqRetrieve
         
         Args: 
             args [argparse object]: PDB ID arg from the terminal
+            out_directory [str]: File path where the files should be written
         """
         
         self.args = args
+        self.out_dir = out_directory
     
     def struct_retrieve(self): 
         """Retrieve the PDB structure from the terminal argument. 
@@ -48,13 +50,15 @@ class StructSeqRetrieve:
             
         """
         
-        Pdb_id = self.args.id_input
+        pdb_id = self.args.id_input
         pdbl = PDBList()
         ppb = PPBuilder()
+        
+        path = Path(self.out_dir)
 
-        pdbl.retrieve_pdb_file(Pdb_id, file_format='pdb', pdir=".")
-        p = Path(f'pdb{Pdb_id}.ent')
-        p.replace(f'{Pdb_id}.pdb')
+        pdbl.retrieve_pdb_file(pdb_id, file_format='pdb', pdir=path)
+        p = Path(f"{path}/pdb{pdb_id}.ent")
+        p.replace(f'{path}/{pdb_id}.pdb')
         
         return ("PDB file written.")
 
@@ -70,17 +74,17 @@ class StructSeqRetrieve:
             
         """
         
-        pdb_file = f"{self.args.id_input}.pdb"
+        pdb_file = f"{self.out_dir}/{self.args.id_input}.pdb"
         ppb = PPBuilder()
         p = PDBParser()
 
         struct = p.get_structure('x', pdb_file)
 
-        with open (f"{args.id_input}.fasta", "w") as f: 
+        with open (f"{self.out_dir}/{self.args.id_input}.fasta", "w") as f: 
         # OPen a fasta file and write the extracted sequence
             for pp in ppb.build_peptides(struct): 
                 seq = str(pp.get_sequence())
                 f.write("\n".join(seq[i : i + 80] \
                             for i in range(0, len(seq), 80)))
 
-        return (f"Sequence file written at {args.id_input}.fasta")
+        return (f"Sequence file written at {self.out_dir}/{self.args.id_input}.fasta")

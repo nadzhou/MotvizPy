@@ -29,7 +29,7 @@ class Analysis:
         seq [1d list]: Sequences of amino acids from fasta file 
     
     """  
-    def seq2np(self, seq): 
+    def seq2np(self): 
         """"Turn the sequence into numpy S1 array for calculations later. 
         
         Args: 
@@ -40,9 +40,9 @@ class Analysis:
             
         """
         
-        return np.asarray(seq, dtype='S1')
+        return np.asarray(self.seq, dtype='S1')
               
-    def __init__(self, seq): 
+    def __init__(self, seq, pdb_id): 
         """Initialize class Analysis. 
         
         Convert the 2d list to np array and make accessible
@@ -50,12 +50,13 @@ class Analysis:
         
         Args: 
             seq [list of lists]: 2d list of sequences
+            pdb_id [str]: PDB ID that will be written in the 
+                    final PyMol script file.  
             
         """   
-        np_seq = self.seq2np(seq)
         self.seq = seq
-        self.np_seq = np_seq   
-            
+        self.pdb_id = pdb_id
+        
     def _shannon(self, array): 
         """Calculate Shannon Entropy vertically via loop. 
         
@@ -83,7 +84,7 @@ class Analysis:
                 entropy += (- p_x*math.log(p_x, 2)/20)
         return entropy
         
-    def conservation_score(self): 
+    def conservation_score(self, np_seq): 
         """Calculate the Shannon Entropy vertically
         for each position in the amino acid msa sequence.
         
@@ -95,7 +96,7 @@ class Analysis:
             scores vertically into a float nd array   
         """
         
-        return np.apply_along_axis(self._shannon, 0, self.np_seq)      
+        return np.apply_along_axis(self._shannon, 0, np_seq)      
 
     def normalize_data(self, ent_list): 
         """Takes the entropy array and normalizes the data. 
@@ -176,7 +177,7 @@ class Analysis:
         
         path = Path(out_file)
         with open(path, "w") as file: 
-            file.write(f"fetch 1xef\n")
+            file.write(f"fetch {self.pdb_id}\n\n")
             for i in range(len(pos)): 
                 file.write(f"create mot{pos[i]}, resi {pos[i]}-{pos[i]+4} \n")
                 
