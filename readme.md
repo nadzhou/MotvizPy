@@ -1,5 +1,4 @@
-# MotvizPy - PROTEIN MOTIF DISCOVERY AND VISUALIZATION TOOL 
-## Introduction 
+# MotvizPy - a protein motif discovery & visualization tool
 This tool is a Python rendition of the Java-based tool Motviz1[1] published in 2011. 
 MotvizPy uses Shannon Entropy at its core to calculate conservation from a MSA file generated from 
 PSI-BLAST searches of the reference protein database. The Shannon Entropy part of 
