@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.7
+
 from Bio import SeqIO
 from Bio.Blast import NCBIXML
 from Bio import SearchIO
@@ -24,5 +26,4 @@ def xml_parser(in_file):
     return SeqIO.write(seqs[:100], "navid.fasta", "fasta")
 
 
-xml_parser("/home/nadzhou/Desktop/out_psi.xml")
     

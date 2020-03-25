@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.7
+
 from Bio.Blast.Applications import NcbipsiblastCommandline
 import subprocess
 
@@ -28,4 +30,3 @@ def psi_blaster(in_file):
     if r.communicate(): 
         return ("PSI-BLAST done. File written out_psi.xml")
         
-psi_blaster("./1xef.fasta")

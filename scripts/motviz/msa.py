@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.7
+
 from Bio.Align.Applications import ClustalOmegaCommandline
 import subprocess
 
@@ -12,7 +14,6 @@ def msa(in_file):
         out_file [file]: Aligned sequences that is ready for analysis. 
     
     """
-
         
     out_file = str("/home/nadzhou/Desktop/clustal.fasta")
 
@@ -29,4 +30,3 @@ def msa(in_file):
 
 
 
-msa(str("/home/nadzhou/Desktop/navid.fasta"))

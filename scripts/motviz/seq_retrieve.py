@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.7
+
 import argparse as ap 
 from Bio.PDB import PDBList
 from Bio.PDB import *
@@ -41,6 +43,7 @@ def struct_retrieve(args):
     pdbl.retrieve_pdb_file(Pdb_id, file_format='pdb', pdir=".")
     p = Path(f'pdb{Pdb_id}.ent')
     p.replace(f'{Pdb_id}.pdb')
+    
     return ("PDB file written.")
 
 def seq_extract(args): 
@@ -68,7 +71,7 @@ def seq_extract(args):
             f.write("\n".join(seq[i : i + 80] \
                         for i in range(0, len(seq), 80)))
 
-    return ("Sequence file written.   ")
+    return (f"Sequence file written at {args.id_input}.fasta")
 
 args = parse_arguments()    
 struct_retrieve(args)
