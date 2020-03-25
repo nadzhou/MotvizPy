@@ -2,19 +2,17 @@ from Bio.Blast.Applications import NcbipsiblastCommandline
 import subprocess
 
 def psi_blaster(in_file):
-    """
-    Via the refseq_protein database present on PC, 
-    PSI-BLAST is achieved via the command line. 
+    """Perform a PSI-BLAST via the refseq-protein.00
+    database available locally and then get XML output. 
     
     Args: 
-        input file 
-    Returns 
-        PSI XML File 
-
-    This XML file will then be parsed and only 
-    sequences will be written for a round of 
-    MSA. 
+        in_file [str]: Path to the input file for BLAST search. 
+        
+    Returns: 
+        out_psi.xml [file]: Tell the user operation is done 
+    
     """
+    
     in_file = str(in_file)
     print("Initiating PSI-BLAST...")
 
@@ -26,8 +24,8 @@ def psi_blaster(in_file):
     cmd = cmd.split(" ")
     cmd = list(cmd)
     r = subprocess.Popen(cmd)
-    r.communicate()
-
-    print("PSI-BLAST done. File written out_psi.xml")
+    
+    if r.communicate(): 
+        return ("PSI-BLAST done. File written out_psi.xml")
         
 psi_blaster("./1xef.fasta")

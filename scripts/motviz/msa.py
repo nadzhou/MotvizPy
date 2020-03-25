@@ -2,11 +2,16 @@ from Bio.Align.Applications import ClustalOmegaCommandline
 import subprocess
 
 def msa(in_file): 
-    """Generate an MSA of the PSI-BLAST results
-    Args 
-        input psi_blast file
-    Returns 
-        Fasta file"""
+    """Take the sequences from the PSI-BLAST result and
+    do a Clustal Omega alignment on all the sequences. 
+    
+    Args: 
+        in_file [str]: Path to the input file. 
+        
+    Returns: 
+        out_file [file]: Aligned sequences that is ready for analysis. 
+    
+    """
 
         
     out_file = str("/home/nadzhou/Desktop/clustal.fasta")
@@ -20,8 +25,8 @@ def msa(in_file):
 
     r = subprocess.Popen(cmd_str)
     if (r.communicate()): 
-        print("\n Clustal Omega done")
-        print("File written.")
+        return (f"\n Clustal Omega done\nFile written at {out_file}\n")
+
 
 
 msa(str("/home/nadzhou/Desktop/navid.fasta"))

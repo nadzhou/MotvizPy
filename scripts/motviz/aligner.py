@@ -5,23 +5,23 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
 def xml_parser(in_file): 
-    """
-    The PSI-BLAST results then need to 
-    get polished so as to get the fasta 
-    sequence. 
+    """Parse the XML file and then give 
+    out top 100 sequences into a fasta file. 
 
     Args: 
-        Input XML file 
-    Returns:    
-        Psi-BLAST fasta file
+        in_file [str]: Path to the input file. 
+        
+    Returns: 
+        navid.fasta [file]: Top 100 sequences written into file
     """
+    
     seqs = []
     blast_records = SearchIO.read(in_file, "blast-xml")
     for hsp in blast_records.hsps: 
         print(hsp.hit)
         seqs.append(hsp.hit)
           
-    SeqIO.write(seqs[:100], "navid.fasta", "fasta")
+    return SeqIO.write(seqs[:100], "navid.fasta", "fasta")
 
 
 xml_parser("/home/nadzhou/Desktop/out_psi.xml")

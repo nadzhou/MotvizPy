@@ -6,7 +6,16 @@ from Bio import SeqIO
 
 
 def parse_arguments(parser=None): 
-    """Parse arguments given by the terminal for PDB ID."""
+    """Parser will take PDB ID input from terminal to retrieve the file
+    
+    Args: 
+        parser [argparse]: Take an argparse from terminal
+        
+    Returns: 
+        args [argparse]: This will be used for retrieveing PDB
+        
+    """
+    
     if not parser: 
         parser = ap.ArgumentParser()
     parser.add_argument("id_input", help="Input PDB ID")
@@ -14,15 +23,17 @@ def parse_arguments(parser=None):
 
     return args
 
-def struct_seq_retrieve(args): 
-    """
-    Retrieve PDB structure given the PDB Id.
+def struct_retrieve(args): 
+    """Retrieve the PDB structure from the terminal argument. 
     
-    Args
-        PDB ID
-    Returns 
-        PDB structure file
+    Args: 
+        args [argparse object]: Contains the id_input argument
+        
+    Returns: 
+        prompt [str]: File successfully written
+        
     """
+    
     Pdb_id = args.id_input
     pdbl = PDBList()
     ppb = PPBuilder()
@@ -30,16 +41,20 @@ def struct_seq_retrieve(args):
     pdbl.retrieve_pdb_file(Pdb_id, file_format='pdb', pdir=".")
     p = Path(f'pdb{Pdb_id}.ent')
     p.replace(f'{Pdb_id}.pdb')
-    print("PDB file written.")
+    return ("PDB file written.")
 
 def seq_extract(args): 
-    """
-    Once the PDB structure is retrieved, retrieve sequence.
+    """Extract the sequence from the given PDB file 
+    and write it to a fasta file. 
+    
     Args: 
-        PDB ID input
-    Returns
-        Sequence fasta file
+        args [argparse object]: Take in the PDB ID
+        
+    Returns: 
+        prompt [str]: File written to directory. 
+        
     """
+    
     pdb_file = f"{args.id_input}.pdb"
     ppb = PPBuilder()
     p = PDBParser()
@@ -53,8 +68,8 @@ def seq_extract(args):
             f.write("\n".join(seq[i : i + 80] \
                         for i in range(0, len(seq), 80)))
 
-    print("Sequence file written.   ")
+    return ("Sequence file written.   ")
 
 args = parse_arguments()    
-struct_seq_retrieve(args)
+struct_retrieve(args)
 seq_extract(args)
