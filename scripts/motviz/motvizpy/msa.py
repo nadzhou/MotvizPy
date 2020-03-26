@@ -9,14 +9,12 @@ def msa(in_file, out_file):
     
     Args: 
         in_file [str]: Path to the input file. 
-        out_file [str]: Address to where the fasta file should be written.
         
     Returns: 
         out_file [file]: Aligned sequences that is ready for analysis. 
     
     """
         
-
     clustalomega_cline = ClustalOmegaCommandline(infile=in_file, \
                         outfile=out_file, verbose=True)
 
