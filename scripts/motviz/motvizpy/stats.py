@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.signal import argrelextrema
 from pathlib import Path
+from collections import Counter
+
+import plotly.graph_objects as go
 
 def seq_extract(in_file): 
     """Extrct the sequence from the fasta file
@@ -68,21 +71,14 @@ class Analysis:
         
         """
         
-        array = str(array)
-        entropy = 0 
+        aa_count = Counter(array)
+        pA = 1
+        for k, v in aa_count.items(): 
+            pA *= (v / 21)
         
-        for x in array: 
-            char_count = np.char.count(array, sub=x)
-
-            if x == "-": 
-                # Penalize columns with all - values
-                p_x = float(char_count/len(array)*2) 
-                
-            else: p_x = float(char_count/len(array))
-            
-            if p_x > 0: 
-                entropy += (- p_x*math.log(p_x, 2)/20)
-        return entropy
+        return -np.sum(pA*np.log2(pA))
+        
+        
         
     def conservation_score(self, np_seq): 
         """Calculate the Shannon Entropy vertically
@@ -135,13 +131,15 @@ class Analysis:
         
         return polished_minima
 
-    def find_motif(self, data, minima): 
+    def find_motif(self, data, minima, threshold): 
         """Given the minima and data, look for consecutive
         set (word size of 4) of values that are 1/4th of the mean. 
         
         Args; 
-            data [nd float array]: Normalized conservation data
+            data [nd float array]: Normalized conservation daa
             minima [1d list]: List of minima lower than the mean 
+            threshold [float]: Threshold value below which all 
+                consecutive values whill be taken up as motifs 
                         
         Returns: 
             pos_motif [1d list]: Possible motifs that have 4 consecutive 
@@ -153,7 +151,7 @@ class Analysis:
         
         pos_motif = []
         pos = []
-        threshold = float(np.mean(data)/2)
+
         for i in minima: 
             if i - 4 > 0: 
                 motif_stretch = data[i - 1 : i + 1]
@@ -178,31 +176,81 @@ class Analysis:
         path = Path(out_file)
         with open(path, "w") as file: 
             file.write(f"fetch {self.pdb_id}\n\n")
-            for i in range(len(pos)): 
+            for i,_ in enumerate(pos): 
                 file.write(f"create mot{pos[i]}, resi {pos[i]}-{pos[i]+4} \n")
                 
             file.write("\nhide_all\n")
             file.write("\n")
-            for i in range(len(pos)): 
+            for i,_ in enumerate(pos): 
                 file.write(f"show cartoon, resi{pos[i]}\n")
             file.write("\n")
-            for i in range(len(pos)): 
+            for i,_ in enumerate(pos): 
                 file.write(f"color red, mot{pos[i]}\n")
         
+def lay(): 
+    layout = go.Layout(
+    title=go.layout.Title(
+        text='Conservation score per amino acid position',
+        xref='paper',
+        x=0.5,
+        font=dict(
+                family='Courier New, monospace',
+                size=18,
+                color='#7f7f7f'
+            )
+    ),
+    xaxis=go.layout.XAxis(
+        title=go.layout.xaxis.Title(
+            text='Amino acid position',
+            font=dict(
+                family='Courier New, monospace',
+                size=18,
+                color='#7f7f7f'
+            )
+        )
+    ),
+    yaxis=go.layout.YAxis(
+        title=go.layout.yaxis.Title(
+            text='Conservation score',
+            font=dict(
+                family='Courier New, monospace',
+                size=18,
+                color='#7f7f7f'
+            )
+        )
+    ), 
+    hovermode="closest",
+                     updatemenus=[dict(type="buttons",
+                                       buttons=[dict(label="Play",
+                                                     method="animate",
+                                                     args=[None])])]
+)
+    return layout
+
 
 def main(): 
     seq = seq_extract("/home/nadzhou/Desktop/clustal.fasta")
     seq = [[x for x in y] for y in seq]
 
-    c = Analysis(seq)
+    c = Analysis(seq, "1xef")
 
-    c_ent = c.conservation_score()
+    c_ent = c.conservation_score(c.seq2np())
     norm_data = c.normalize_data(c_ent)
-    norm_data_len = [x for x in range(len(norm_data))]
+    norm_data_len = [i for i,_ in enumerate(norm_data)]
     minima = c.find_local_minima(norm_data)
 
     print(norm_data)
-    pos_motif, pos = c.find_motif(norm_data, minima)
+
+    pos_motif, pos = c.find_motif(norm_data, minima, 0.25)
+    c.pymol_script_writer("/home/nadzhou/Desktop/1ft.txt", pos)
+    
+    data = go.Scatter(
+        x=norm_data_len, 
+        y=norm_data,
+        name="Entropy"
+    )
+    fig = go.Figure(data=data, layout=lay())
+    fig.show()  
     
 if __name__ == "__main__": 
     main()
