@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.7
 
 import numpy as np
+import pandas as pd
 from Bio import SeqIO
 import math
 import matplotlib.pyplot as plt
@@ -8,8 +9,6 @@ import seaborn as sns
 from scipy.signal import argrelextrema
 from pathlib import Path
 from collections import Counter
-
-import plotly.graph_objects as go
 
 def seq_extract(in_file): 
     """Extrct the sequence from the fasta file
@@ -72,6 +71,8 @@ class Analysis:
         """
         
         aa_count = Counter(array)
+        max_value = max(aa_count.values())
+        
         pA = 1
         for k, v in aa_count.items(): 
             pA *= (v / 21)
@@ -162,6 +163,21 @@ class Analysis:
                        
         return (pos_motif, pos)
     
+    def csv_writer(self, file, cons_data): 
+        """Write the conservation data on a a CSV file
+        
+        Args: 
+            file [str]: File path to where the data should be written
+            cons_data [dict]: Amino acid position as key and conservation value as value
+            
+        """
+        print(cons_data)
+        
+        df = pd.DataFrame.from_dict(cons_data, orient="index")
+        df.index.name = "Amino acid position"
+        df.columns = ["Conservation score"]
+        df.to_csv(file)
+    
     def pymol_script_writer(self, out_file, pos): 
         """Motifs that are found are then written a txt file.
         Thhis is then run on PyMol by typing the following on terminal: 
@@ -187,46 +203,6 @@ class Analysis:
             for i,_ in enumerate(pos): 
                 file.write(f"color red, mot{pos[i]}\n")
         
-def lay(): 
-    layout = go.Layout(
-    title=go.layout.Title(
-        text='Conservation score per amino acid position',
-        xref='paper',
-        x=0.5,
-        font=dict(
-                family='Courier New, monospace',
-                size=18,
-                color='#7f7f7f'
-            )
-    ),
-    xaxis=go.layout.XAxis(
-        title=go.layout.xaxis.Title(
-            text='Amino acid position',
-            font=dict(
-                family='Courier New, monospace',
-                size=18,
-                color='#7f7f7f'
-            )
-        )
-    ),
-    yaxis=go.layout.YAxis(
-        title=go.layout.yaxis.Title(
-            text='Conservation score',
-            font=dict(
-                family='Courier New, monospace',
-                size=18,
-                color='#7f7f7f'
-            )
-        )
-    ), 
-    hovermode="closest",
-                     updatemenus=[dict(type="buttons",
-                                       buttons=[dict(label="Play",
-                                                     method="animate",
-                                                     args=[None])])]
-)
-    return layout
-
 
 def main(): 
     seq = seq_extract("/home/nadzhou/Desktop/clustal.fasta")
@@ -240,18 +216,16 @@ def main():
     minima = c.find_local_minima(norm_data)
 
     print(norm_data)
+    
+    cons_data = dict(enumerate(norm_data.flatten(), 1))
+    file_path = "/home/nadzhou/Desktop/biryani.csv"
 
+    c.csv_writer(file_path, cons_data)  
+            
     pos_motif, pos = c.find_motif(norm_data, minima, 0.25)
     c.pymol_script_writer("/home/nadzhou/Desktop/1ft.txt", pos)
     
-    data = go.Scatter(
-        x=norm_data_len, 
-        y=norm_data,
-        name="Entropy"
-    )
-    fig = go.Figure(data=data, layout=lay())
-    fig.show()  
-    
+
 if __name__ == "__main__": 
     main()
 
