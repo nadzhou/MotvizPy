@@ -214,8 +214,6 @@ def main():
     norm_data = c.normalize_data(c_ent)
     norm_data_len = [i for i,_ in enumerate(norm_data)]
     minima = c.find_local_minima(norm_data)
-
-    print(norm_data)
     
     cons_data = dict(enumerate(norm_data.flatten(), 1))
     file_path = "/home/nadzhou/Desktop/biryani.csv"

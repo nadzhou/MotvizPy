@@ -2,14 +2,21 @@ import plotly.graph_objects as go
 
 import numpy as np
 import pandas as pd
+from pathlib import Path
 
 def view_graph(file): 
+    """Visualiza the conservation score dataa from directory
+    Graph the data as an interative scatter plot. 
+    
+    Args: 
+        file [str]: Path address for the csv file 
+    
+    """
     df = pd.read_csv(file)
     
     norm_data_len = np.array(df['Amino acid position'])
     norm_data = np.array(df['Conservation score'])
 
-    print(norm_data)
     data = go.Scatter(
         x=norm_data_len, 
         y=norm_data,
@@ -21,6 +28,14 @@ def view_graph(file):
     
 
 def lay(): 
+    """Layout design for the Plotly object. 
+    Labels the x and y axes and gives hover animations 
+    
+    Returns: 
+        layout [plotly go object]: Layout object
+    
+    """
+    
     layout = go.Layout(
     title=go.layout.Title(
         text='Conservation score per amino acid position',
@@ -62,8 +77,10 @@ def lay():
 
 
 def main(): 
-    path = "/home/nadzhou/Desktop/biryani.csv"
-    view_graph(path)
+    path = Path( "/home/nadzhou/Desktop/biryani.csv")
+    
+    if path: 
+        view_graph(path)
     
     
 if __name__ == "__main__": 
