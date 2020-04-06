@@ -9,8 +9,9 @@ import seaborn as sns
 from scipy.signal import argrelextrema
 from pathlib import Path
 from collections import Counter
+from Bio import AlignIO
 
-def seq_extract(in_file): 
+def seq_extract(in_file, file_ext): 
     """Extrct the sequence from the fasta file
     
     Args: 
@@ -20,8 +21,15 @@ def seq_extract(in_file):
         seqs [1d list]: Protein sequences lisst
         
     """
-    record = SeqIO.parse(in_file, "fasta")
-    seqs = [i.seq for i in record]
+    if file_ext == "sth": 
+        file_ext = "stockholm"
+        
+    elif file_ext == "aln" or file_ext == "clustal": 
+        file_ext = "clustal"  
+         
+    alignment = AlignIO.read(in_file, file_ext)    
+    seqs = [i.seq for i in alignment]
+
     return seqs
 
 class Analysis: 
@@ -75,7 +83,7 @@ class Analysis:
         
         pA = 1
         for k, v in aa_count.items(): 
-            pA *= (v / 21)
+            pA *= (v / 5)
         
         return -np.sum(pA*np.log2(pA))
         
@@ -171,11 +179,10 @@ class Analysis:
             cons_data [dict]: Amino acid position as key and conservation value as value
             
         """
-        print(cons_data)
-        
+        cons_data = {k:v for k, v in cons_data.items() if v > 0.50}        
         df = pd.DataFrame.from_dict(cons_data, orient="index")
-        df.index.name = "Amino acid position"
-        df.columns = ["Conservation score"]
+        df.index.name = "Nucleotide position"
+        df.columns = ["Variation score"]
         df.to_csv(file)
     
     def pymol_script_writer(self, out_file, pos): 
@@ -205,9 +212,9 @@ class Analysis:
         
 
 def main(): 
-    seq = seq_extract("/home/nadzhou/Desktop/clustal.fasta")
+    seq = seq_extract("/home/nadzhou/Desktop/test.fasta", "fasta")
     seq = [[x for x in y] for y in seq]
-
+    print(seq)
     c = Analysis(seq, "1xef")
 
     c_ent = c.conservation_score(c.seq2np())
@@ -216,12 +223,11 @@ def main():
     minima = c.find_local_minima(norm_data)
     
     cons_data = dict(enumerate(norm_data.flatten(), 1))
-    file_path = "/home/nadzhou/Desktop/biryani.csv"
+    file_path = "/home/nadzhou/Desktop/results.csv"
 
     c.csv_writer(file_path, cons_data)  
             
-    pos_motif, pos = c.find_motif(norm_data, minima, 0.25)
-    c.pymol_script_writer("/home/nadzhou/Desktop/1ft.txt", pos)
+    
     
 
 if __name__ == "__main__": 
