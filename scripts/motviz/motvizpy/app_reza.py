@@ -37,8 +37,8 @@ def view_graph(file, file2):
     data = [data1, data2]
     
     fig = make_subplots(rows=1, cols=2, specs=[[{'type':'scatter'}, {'type':'pie'}]])
-    fig.add_trace(go.Pie(labels=aa, values=freq, scalegroup=1), 1, 2)
-    fig.add_trace(go.Scatter(x=norm_data_len, y=norm_data, name="Entropy"), 1, 1)
+    fig.add_trace(go.Pie(labels=aa, values=freq, scalegroup=1), row=1, col=2)
+    fig.add_trace(go.Scatter(x=norm_data_len, y=norm_data, name="Entropy"), row=1, col=1)
     fig.update_layout(title_text="Amino Acid positions",
                   title_font_size=30)
     fig.show()  
