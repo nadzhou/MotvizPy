@@ -10,6 +10,7 @@ from scipy.signal import argrelextrema
 from pathlib import Path
 from collections import Counter
 from Bio import AlignIO
+import re
 
 def seq_extract(in_file, file_ext): 
     """Extrct the sequence from the fasta file
@@ -28,7 +29,7 @@ def seq_extract(in_file, file_ext):
         file_ext = "clustal"  
          
     alignment = AlignIO.read(in_file, file_ext)    
-    seqs = [i.seq for i in alignment]
+    seqs = {i.id : str(i.seq) for i in alignment}
 
     return seqs
 
@@ -140,6 +141,22 @@ class Analysis:
         
         return polished_minima
 
+    def moving_average(self, data, n=3) :
+        """Calculated the rolling average of teh data
+
+        Args: 
+            data [numpy nd array]: Float array of the conservation score calculated
+            n [int]: Rolling average wegith
+
+        Returns: 
+            avg_data [numpy nd array]: Float array of rolling average
+    
+        """
+        avg_data = np.cumsum(data, dtype=float)
+        avg_data[n:] = avg_data[n:] - avg_data[:-n]
+
+        return avg_data[n - 1:] / n
+
     def find_motif(self, data, minima, threshold): 
         """Given the minima and data, look for consecutive
         set (word size of 4) of values that are 1/4th of the mean. 
@@ -211,24 +228,39 @@ class Analysis:
                 file.write(f"color red, mot{pos[i]}\n")
         
 
+
 def main(): 
-    seq = seq_extract("/home/nadzhou/Desktop/test.fasta", "fasta")
-    seq = [[x for x in y] for y in seq]
-    print(seq)
+    orig_file = Path("/home/nadzhou/Desktop/1yu5.fasta")
+    seq_dict = seq_extract("/home/nadzhou/Desktop/omega.aln", "clustal")
+    seq = [[x for x in y] for y in seq_dict.values()]
     c = Analysis(seq, "1xef")
 
     c_ent = c.conservation_score(c.seq2np())
+
+
     norm_data = c.normalize_data(c_ent)
+
+
+    norm_data = c.moving_average(norm_data)
+
     norm_data_len = [i for i,_ in enumerate(norm_data)]
     minima = c.find_local_minima(norm_data)
     
-    cons_data = dict(enumerate(norm_data.flatten(), 1))
-    file_path = "/home/nadzhou/Desktop/results.csv"
+    pos_motif, pos = c.find_motif(norm_data, minima, 4)
+    
+    seq2 = c.original_file_seq_extract(orig_file)
 
-    c.csv_writer(file_path, cons_data)  
-            
-    
-    
+    seq_residues = c.find_motif_pos(pos,  seq2)    
+
+    plotter = {}
+
+    for i in seq_residues: 
+        for k, v in seq_dict.items(): 
+            if i in v: 
+                plotter[k] = i
+
+
+
 
 if __name__ == "__main__": 
     main()
