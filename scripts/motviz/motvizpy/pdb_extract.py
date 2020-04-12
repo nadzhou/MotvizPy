@@ -4,6 +4,9 @@ import urllib.request
 from pathlib import Path
 
 
+import seaborn as sns 
+import matplotlib.pyplot as plt
+
 from stats import Analysis
 from stats import seq_extract
 
@@ -84,6 +87,10 @@ def main():
 
 
     norm_data = c.moving_average(norm_data)
+
+    sns.set(style="whitegrid")
+    sns.heatmap(norm_data.reshape(15, 15, 1))
+    plt.show()
 
     norm_data_len = [i for i,_ in enumerate(norm_data)]
     minima = c.find_local_minima(norm_data)
