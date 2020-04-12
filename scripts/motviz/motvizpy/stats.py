@@ -248,17 +248,6 @@ def main():
     
     pos_motif, pos = c.find_motif(norm_data, minima, 4)
     
-    seq2 = c.original_file_seq_extract(orig_file)
-
-    seq_residues = c.find_motif_pos(pos,  seq2)    
-
-    plotter = {}
-
-    for i in seq_residues: 
-        for k, v in seq_dict.items(): 
-            if i in v: 
-                plotter[k] = i
-
 
 
 
