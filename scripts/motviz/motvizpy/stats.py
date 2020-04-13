@@ -180,7 +180,7 @@ class Analysis:
 
         for i in minima: 
             if i - 4 > 0: 
-                motif_stretch = data[i - 1 : i + 1]
+                motif_stretch = data[i - 2 : i + 2]
                 if np.all(motif_stretch < threshold): 
                     # Take the first value. 
                     pos_motif.append(motif_stretch[0])

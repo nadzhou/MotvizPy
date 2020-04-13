@@ -74,17 +74,10 @@ class StructSeqRetrieve:
             
         """
         
-        pdb_file = f"{self.out_dir}/{self.args.id_input}.pdb"
-        ppb = PPBuilder()
-        p = PDBParser()
+        pdb_id = f"{self.out_dir}/{self.args.id_input}.pdb"
 
-        struct = p.get_structure('x', pdb_file)
+        pdb_record = SeqIO.parse(pdb_id, "pdb-seqres")
 
-        with open (f"{self.out_dir}/{self.args.id_input}.fasta", "w") as f: 
-        # OPen a fasta file and write the extracted sequence
-            for pp in ppb.build_peptides(struct): 
-                seq = str(pp.get_sequence())
-                f.write("\n".join(seq[i : i + 80] \
-                            for i in range(0, len(seq), 80)))
+        SeqIO.write(pdb_record, f"{self.args.id_input}.fasta", "fasta")
 
         return (f"Sequence file written at {self.out_dir}/{self.args.id_input}.fasta")
