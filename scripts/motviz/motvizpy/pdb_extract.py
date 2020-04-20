@@ -21,23 +21,26 @@ class MotifTable:
     def retrieve_pdb_id(self, query_id):
         url = 'https://www.uniprot.org/uploadlists/'
 
-        for i in query_id: 
-            params = {
-                'from': 'P_REFSEQ_AC',
-                'to': 'PDB_ID',
-                'format': 'tab',
-                'query': f'{i}'
-                }
 
-            data = urllib.parse.urlencode(params)
-            data = data.encode('utf-8')
-            req = urllib.request.Request(url, data)
-            with urllib.request.urlopen(req) as f:
-                response = f.read()
-                print(response.decode('utf-8'))
+        params = {
+            'from': 'ID',
+            'to': 'PDB_ID',
+            'format': 'tab',
+            'query': query_id
+            }
+        data = urllib.parse.urlencode(params)
+        data = data.encode('utf-8')
+        req = urllib.request.Request(url, data)
+        with urllib.request.urlopen(req) as f:
+            response = f.read()
+        response = response.decode("utf-8")
+        results = " ".join(re.split('\t|\n', response))
+        results = re.findall(r'[a-zA-Z0-9]{4}', results)
+        no_duplicates = set(results)
+        
+        for i in no_duplicates: 
+            print(i, end='\t')
 
-    def __init__(self, seq_dict):
-        self.seq_dict = seq_dict
 
     def find_motif_pos(self, pos, seq):
         """Find the sstretches of motifs with a given threshold
@@ -76,7 +79,6 @@ class MotifTable:
 
         return seq
 
-
 def pdb2fasta(file_path): 
     """Retrieve the fasta file, description and
      seq from irectory containing PDB files
@@ -95,7 +97,6 @@ def pdb2fasta(file_path):
 
         SeqIO.write(record, f"{file_without_ext}.fasta", "fasta")
                 
-
 
 def fasta2seq(file_path): 
     """Extract all the fasta sequences from a directory 
@@ -117,39 +118,28 @@ def fasta2seq(file_path):
                 seqs[x.description] = x.seq
     return seqs
 
+
+
 def main(): 
-    # orig_file = Path("/home/nadzhou/Desktop/1yu5.fasta")
-    # in_file = "/home/nadzhou/Desktop/omega.aln"
-    # seq_dict = seq_extract(in_file, "clustal")
+    in_file = "/home/nadzhou/Desktop/omega.aln"
+    seq_dict = seq_extract(in_file, "clustal")
 
-    # seq = [[x for x in y] for y in seq_dict.values()]
-    # c = Analysis(seq, "1xef")
+    #seq_keys = list(seq_dict.keys())
+    #seq_keys = " ".join(seq_keys)
 
-    # c_ent = c.conservation_score(c.seq2np())
-
-
-    # norm_data = c.normalize_data(c_ent)
-
-
-    # norm_data = c.moving_average(norm_data)
-    # norm_data_len = [i for i,_ in enumerate(norm_data)]
-    # minima = c.find_local_minima(norm_data)
-    
-    # pos_motif, pos = c.find_motif(norm_data, minima, 4)
-
-
-    # pdb_inst = MotifTable(seq_dict)
 
     # seq2 = pdb_inst.original_file_seq_extract(orig_file)
 
 
-    # seq_residues = pdb_inst.find_motif_pos(pos,  seq2)    
+    #seq_residues = pdb_inst.find_motif_pos(pos,  seq2)    
 
-    fasta_file_path = "/home/nadzhou/Desktop/pdbs"
-    c = folder2fasta(fasta_file_path)
+    # fasta_file_path = "/home/nadzhou/Desktop/pdbs"
+    # c = fasta2seq(fasta_file_path)
 
-    print(str(c.keys()).split(" "))
+    # struct = list(c.keys()).split(" ")
 
+    # for i in struct: 
+    #     print(i)
     # c = "".join(str(c).strip())
 
     # print("Start \t Pattern \t Parent sequence location")
@@ -170,8 +160,9 @@ def main():
     #     print(f"{k, v}", end="\t\t")
 
     # print("\nRefseq ID - PDB")
-    # pdb_ids = list(plotter.keys())
-    # #pdb_inst.retrieve_pdb_id(pdb_ids)
+    seq_keys = "P04637"
+    pdb_inst = MotifTable()
+    pdb_inst.retrieve_pdb_id(seq_keys)
 
 
 
