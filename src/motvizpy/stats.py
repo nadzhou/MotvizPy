@@ -196,10 +196,9 @@ class Analysis:
             cons_data [dict]: Amino acid position as key and conservation value as value
             
         """
-        cons_data = {k:v for k, v in cons_data.items() if v > 0.50}        
         df = pd.DataFrame.from_dict(cons_data, orient="index")
-        df.index.name = "Nucleotide position"
-        df.columns = ["Variation score"]
+        df.index.name = "Amino acid position"
+        df.columns = ["Conservation score"]
         df.to_csv(file)
     
     def pymol_script_writer(self, out_file, pos): 
@@ -245,8 +244,12 @@ def main():
 
     norm_data_len = [i for i,_ in enumerate(norm_data)]
     minima = c.find_local_minima(norm_data)
+
+    cons_data = {num : data for num, data in zip(norm_data_len, norm_data)}
+
+    c.csv_writer("/home/nadzhou/Desktop/results.csv", cons_data)
     
-    pos_motif, pos = c.find_motif(norm_data, minima, 4)
+    # pos_motif, pos = c.find_motif(norm_data, minima, 4)
     
 
 

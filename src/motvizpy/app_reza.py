@@ -18,9 +18,11 @@ def view_graph(file):
     """
     df = pd.read_csv(file)
     
-    norm_data_len = np.array(df['Nucleotide position'])
-    norm_data = np.array(df['Variation score'])
+    norm_data_len = np.array(df['Amino acid position'])
+    norm_data = np.array(df['Conservation score'])
 
+    y_len_div = [0.75 for i,_ in enumerate(norm_data_len)]
+    y_len_con = [-0.75 for i,_ in enumerate(norm_data_len)]
 
     fig = go.Figure()
 
@@ -28,11 +30,37 @@ def view_graph(file):
             go.Scatter(
                 x=norm_data_len, 
                 y=norm_data,  
+                name="Etnropy score",
             )
     )
 
+    fig.add_trace(
+        go.Scatter(
+            name="Variation threshold", 
+            x=norm_data_len, 
+            y = y_len_div,
+            line=dict(
+                color="Red",
+                width=4,
+                dash="dashdot",
+            ),
+        )
+    )
 
-    fig.update_layout(lay())
+    fig.add_trace(
+        go.Scatter(
+            name="Convergence threshold", 
+            x=norm_data_len, 
+            y=y_len_con, 
+            line=dict(
+                color="RoyalBlue",
+                width=3,
+                dash="dashdot",
+            ),
+        )
+    )
+
+    fig.update_layout(lay(), showlegend=True)
 
 
     fig.show()  
@@ -56,7 +84,18 @@ def draw_pie_chart(file2):
         )
     )
 
-    fig.update_layout(uniformtext_minsize=14, uniformtext_mode='hide')
+    fig.update_layout(
+            uniformtext_minsize=18, uniformtext_mode='hide', 
+            title=go.layout.Title(
+            text='Amino acid sequence physiochemical properties',
+            xref='paper',
+            x=0.5,
+            font=dict(
+                    family='Courier New, monospace',
+                    size=18,
+                    color='#7f7f7f'
+                )
+        ))
 
 
     fig.show()
@@ -69,7 +108,8 @@ def draw_table(file_path):
             fill_color='purple',
             font=dict(color='white', size=17),
             align='center'),
-    cells=dict(values=[df.pdb_id, df.expmethod, df.resolution, 
+    cells=dict(
+            values=[df.pdb_id, df.expmethod, df.resolution, 
                     df.nr_residues, df.nr_atoms, df.status, df.residues],
             line_color='darkslategray',            
             fill=dict(color=['plum', 'white']),
