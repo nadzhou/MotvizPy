@@ -41,7 +41,6 @@ class MotifTable:
         with urllib.request.urlopen(req) as f:
             response = f.read()
         response = response.decode("utf-8")
-        print(response)
         results = " ".join(re.split('\t|\n', response))
         results = re.findall(r'[a-zA-Z0-9]{4}', results)
         no_duplicates = set(results)
@@ -157,7 +156,7 @@ class MotifTable:
             for k, v in results.items(): 
                 if k in info_needed: 
                     temp.append(v)
-            temp.append(resid)
+                    temp.append(resid)
             imp_data.append(temp)
 
         return imp_data
@@ -172,7 +171,7 @@ class MotifTable:
 
         """
         df = pd.DataFrame.from_records(pdb_data, \
-            columns=["PDB_ID", "ExpMethod", "Rsolution", "Number of residues", "Number of atoms", "Status", "Residues"])
+            columns=["PDB_ID", "ExpMethod", "Rsolution", "Number of residues", "Number of atoms", "Status", "Residues"], index=False)
         df.to_csv(file_path, index=False)
 
 
@@ -184,25 +183,22 @@ def main():
     in_file = "/home/nadzhou/Desktop/omega.aln"
     seq_dict = seq_extract(in_file, "clustal")
 
+    file_path = "/home/nadzhou/Desktop/pdbs"
+
+    seq_dict = motif_inst.fasta2seq(file_path)
     seq_keys = list(seq_dict.keys())
-    motif_inst.retrieve_pdb_id(seq_keys)
 
-    # file_path = "/home/nadzhou/Desktop/pdbs"
+    orig_file = "/home/nadzhou/Desktop/1xef.fasta"
+    seq2 = motif_inst.original_file_seq_extract(orig_file)
 
-    # seq_dict = motif_inst.fasta2seq(file_path)
-    # seq_keys = list(seq_dict.keys())
+    pos = [23, 42, 59, 123, 170, 115, 12, 13, 233]
+    seq_residues = motif_inst.find_motif_pos(pos, seq2)
 
-    # orig_file = "/home/nadzhou/Desktop/1xef.fasta"
-    # seq2 = motif_inst.original_file_seq_extract(orig_file)
+    found_in_seqs = motif_inst.find_resis_in_pdb_seqs(seq_residues, seq_dict)    
 
-    # pos = [23, 42, 59, 123, 170, 115, 12, 13, 233]
-    # seq_residues = motif_inst.find_motif_pos(pos, seq2)
-
-    # found_in_seqs = motif_inst.find_resis_in_pdb_seqs(seq_residues, seq_dict)    
-
-    # pdb_data = motif_inst.describe_pdb_file(found_in_seqs, seq_residues)
-    # print(pdb_data)
-    # motif_inst.csv_writer(pdb_data, "/home/nadzhou/Desktop/pdb_results.csv")
+    pdb_data = motif_inst.describe_pdb_file(found_in_seqs, seq_resi)
+    print(pdb_data)
+    motif_inst.csv_writer(pdb_data, "/home/nadzhou/Desktop/pdb_results.csv")
 
 
 
