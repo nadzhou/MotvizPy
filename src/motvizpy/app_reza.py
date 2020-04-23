@@ -8,7 +8,7 @@ import plotly.express as px
 
 
 
-def view_graph(file): 
+def plot_scatter(file): 
     """Visualiza the conservation score dataa from directory
     Graph the data as an interative scatter plot. 
     
@@ -60,13 +60,20 @@ def view_graph(file):
         )
     )
 
-    fig.update_layout(lay(), showlegend=True)
+    fig.update_layout(scatter_layout(), showlegend=True)
 
 
     fig.show()  
     
 
 def draw_pie_chart(file2): 
+    """Draw the pie chart for physiochemical properties of the original PDB
+
+    Args: 
+        file2 [str]: File path to the CSV file
+    
+    """
+
     df2 = pd.read_csv(file2)
 
     aa = np.array(df2['Physiochemical properties'])
@@ -97,10 +104,18 @@ def draw_pie_chart(file2):
                 )
         ))
 
-
     fig.show()
 
+
+
 def draw_table(file_path):
+    """Draw table for the PDB library present on PC with resolution info etc
+
+    Args: 
+        file_path [str]: File path to the CSV file
+    
+    """
+
     df = pd.read_csv(file_path)
 
     fig = go.Figure(data=[go.Table(
@@ -167,7 +182,7 @@ def layout2():
 
 
 
-def lay(): 
+def scatter_layout(): 
     """Layout design for the Plotly object. 
     Labels the x and y axes and gives hover animations 
     
@@ -225,7 +240,7 @@ def main():
     file_path = "/home/nadzhou/Desktop/pdb_results.csv"
 
     if path: 
-        view_graph(path)
+        plot_scatter(path)
 
     draw_pie_chart(path2)
     draw_table(file_path)
