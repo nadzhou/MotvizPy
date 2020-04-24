@@ -16,6 +16,7 @@ def plot_scatter(file):
         file [str]: Path address for the csv file 
     
     """
+
     df = pd.read_csv(file)
     
     norm_data_len = np.array(df['Amino acid position'])
@@ -142,6 +143,8 @@ def draw_table(file_path):
 
 
 def layout2(): 
+    """Plotly object for scatter plot layout"""
+    
     layout = go.Layout(
         title=go.layout.Title(
             xref='paper',
