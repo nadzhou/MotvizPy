@@ -238,9 +238,9 @@ def scatter_layout():
 
 
 def main(): 
-    path = Path( "/home/nadzhou/Desktop/results.csv")
-    path2 = Path("/home/nadzhou/Desktop/plot.csv")
-    file_path = "/home/nadzhou/Desktop/pdb_results.csv"
+    path = Path( "results.csv")
+    path2 = Path("plot.csv")
+    file_path = "/pdb_results.csv"
 
     if path: 
         plot_scatter(path)
