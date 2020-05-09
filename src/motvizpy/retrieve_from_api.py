@@ -28,9 +28,11 @@ def retrieve_pdbs_from_api(uniprot_query_id):
         r.raise_for_status()
         sys.exit()
 
-    record = r.json()
+    record = json.loads(r.text)
 
-    retturn record
+    prots = record['list']
+
+    print(prots)
 
 
 

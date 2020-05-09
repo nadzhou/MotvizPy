@@ -16,7 +16,7 @@ def msa(in_file, out_file):
     """
         
     clustalomega_cline = ClustalOmegaCommandline(infile=in_file, \
-                        outfile=out_file, verbose=True, percent-id="yes")
+                        outfile=out_file, verbose=True)
 
     cmd_str = str(clustalomega_cline).split(" ")
     cmd_str[0] = "./c"
@@ -25,6 +25,24 @@ def msa(in_file, out_file):
     r = subprocess.Popen(cmd_str)
     if (r.communicate()): 
         return (f"\n Clustal Omega done\nFile written at {out_file}\n")
+
+
+
+
+
+def main(): 
+
+    in_file = "/home/nadzhou/Desktop/divided/fast00.fasta"
+    out_file = "/home/nadzhou/Desktop/out.fasta"
+
+    msa(in_file, out_file)
+
+
+
+
+
+if __name__  == '__main__': 
+    main()
 
 
 
