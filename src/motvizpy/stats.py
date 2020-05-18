@@ -4,13 +4,16 @@ import numpy as np
 import pandas as pd
 from Bio import SeqIO
 import math
+
 import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.signal import argrelextrema
+
 from pathlib import Path
 from collections import Counter
 from Bio import AlignIO
 import re
+
 
 def seq_extract(in_file, file_ext): 
     """Extrct the sequence from the fasta file
@@ -33,6 +36,9 @@ def seq_extract(in_file, file_ext):
 
     return seqs
 
+
+
+
 class Analysis: 
     """Class will calculate conservation, visualize, and write PyMol script.
     
@@ -52,6 +58,9 @@ class Analysis:
         """
         
         return np.asarray(self.seq, dtype='S1')
+
+
+
               
     def __init__(self, seq, pdb_id): 
         """Initialize class Analysis. 
@@ -67,6 +76,8 @@ class Analysis:
         """   
         self.seq = seq
         self.pdb_id = pdb_id
+
+
         
     def _shannon(self, array): 
         """Calculate Shannon Entropy vertically via loop. 
@@ -87,6 +98,8 @@ class Analysis:
             pA *= (v / 5)
         
         return -np.sum(pA*np.log2(pA))
+
+
         
         
         
@@ -102,7 +115,10 @@ class Analysis:
             scores vertically into a float nd array   
         """
         
-        return np.apply_along_axis(self._shannon, 0, np_seq)      
+        return np.apply_along_axis(self._shannon, 0, np_seq)  
+
+
+
 
     def normalize_data(self, ent_list): 
         """Takes the entropy array and normalizes the data. 
@@ -117,6 +133,8 @@ class Analysis:
         
         return (2.*(ent_list - \
             np.min(ent_list))/np.ptp(ent_list)-1)       
+
+
         
     
     def find_local_minima(self, data): 
@@ -140,6 +158,9 @@ class Analysis:
                     polished_minima.append(j)
         
         return polished_minima
+
+
+
 
     def moving_average(self, data, n=3) :
         """Calculated the rolling average of teh data
@@ -187,6 +208,9 @@ class Analysis:
                     pos.append(i)
                        
         return (pos_motif, pos)
+
+
+
     
     def csv_writer(self, file, cons_data): 
         """Write the conservation data on a a CSV file
