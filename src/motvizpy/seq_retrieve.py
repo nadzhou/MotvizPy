@@ -78,6 +78,6 @@ class StructSeqRetrieve:
 
         pdb_record = SeqIO.parse(pdb_id, "pdb-seqres")
 
-        SeqIO.write(pdb_record, f"{self.args.id_input}.fasta", "fasta")
+        SeqIO.write(pdb_record, f"{self.out_dir}/{self.args.id_input}.fasta", "fasta")
 
-        return (f"Sequence file written at {self.out_dir}/{self.args.id_input}.fasta")
+        print("Fasta file written")

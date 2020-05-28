@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="6d028bd0-7343-453a-9ade-94a7fa25ad56" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1cLnc1oecwjBIT52cvAlveVZqh0" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.path.for.package.eslint" value="project" />
+    <property name="node.js.path.for.package.tslint" value="project" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="RunManager">
+    <configuration name="stats" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="MOTVIZ" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/motvizpy" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/motvizpy/stats.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.stats" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6d028bd0-7343-453a-9ade-94a7fa25ad56" name="Default Changelist" comment="" />
+      <created>1590316816631</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1590316816631</updated>
+      <workItem from="1590316829513" duration="7000" />
+      <workItem from="1590316872014" duration="2217000" />
+      <workItem from="1590573695118" duration="78000" />
+    </task>
+    <task id="LOCAL-00001" summary="removed unnecessary scripts file.">
+      <created>1590317127102</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1590317127102</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="removed unnecessary scripts file." />
+    <option name="LAST_COMMIT_MESSAGE" value="removed unnecessary scripts file." />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="224" y="27" width="980" height="741" key="CommitChangelistDialog2" timestamp="1590317126724">
+      <screen x="72" y="27" width="1294" height="741" />
+    </state>
+    <state x="224" y="27" width="980" height="741" key="CommitChangelistDialog2/72.27.1294.741@72.27.1294.741" timestamp="1590317126724" />
+    <state width="1228" height="150" key="GridCell.Tab.0.bottom" timestamp="1590320063448">
+      <screen x="72" y="27" width="1294" height="741" />
+    </state>
+    <state width="1228" height="150" key="GridCell.Tab.0.bottom/72.27.1294.741@72.27.1294.741" timestamp="1590320063448" />
+    <state width="1228" height="150" key="GridCell.Tab.0.center" timestamp="1590320063447">
+      <screen x="72" y="27" width="1294" height="741" />
+    </state>
+    <state width="1228" height="150" key="GridCell.Tab.0.center/72.27.1294.741@72.27.1294.741" timestamp="1590320063447" />
+    <state width="1228" height="150" key="GridCell.Tab.0.left" timestamp="1590320063447">
+      <screen x="72" y="27" width="1294" height="741" />
+    </state>
+    <state width="1228" height="150" key="GridCell.Tab.0.left/72.27.1294.741@72.27.1294.741" timestamp="1590320063447" />
+    <state width="1228" height="150" key="GridCell.Tab.0.right" timestamp="1590320063447">
+      <screen x="72" y="27" width="1294" height="741" />
+    </state>
+    <state width="1228" height="150" key="GridCell.Tab.0.right/72.27.1294.741@72.27.1294.741" timestamp="1590320063447" />
+    <state width="1228" height="188" key="GridCell.Tab.1.bottom" timestamp="1590317330640">
+      <screen x="72" y="27" width="1294" height="741" />
+    </state>
+    <state width="1228" height="188" key="GridCell.Tab.1.bottom/72.27.1294.741@72.27.1294.741" timestamp="1590317330640" />
+    <state width="1228" height="188" key="GridCell.Tab.1.center" timestamp="1590317330639">
+      <screen x="72" y="27" width="1294" height="741" />
+    </state>
+    <state width="1228" height="188" key="GridCell.Tab.1.center/72.27.1294.741@72.27.1294.741" timestamp="1590317330639" />
+    <state width="1228" height="188" key="GridCell.Tab.1.left" timestamp="1590317330639">
+      <screen x="72" y="27" width="1294" height="741" />
+    </state>
+    <state width="1228" height="188" key="GridCell.Tab.1.left/72.27.1294.741@72.27.1294.741" timestamp="1590317330639" />
+    <state width="1228" height="188" key="GridCell.Tab.1.right" timestamp="1590317330640">
+      <screen x="72" y="27" width="1294" height="741" />
+    </state>
+    <state width="1228" height="188" key="GridCell.Tab.1.right/72.27.1294.741@72.27.1294.741" timestamp="1590317330640" />
+    <state x="208" y="31" width="1022" height="737" key="SettingsEditor" timestamp="1590320132146">
+      <screen x="72" y="27" width="1294" height="741" />
+    </state>
+    <state x="208" y="31" width="1022" height="737" key="SettingsEditor/72.27.1294.741@72.27.1294.741" timestamp="1590320132146" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/MOTVIZ$stats.coverage" NAME="stats Coverage Results" MODIFIED="1590320145643" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/motvizpy" />
+  </component>
+</project>

@@ -201,7 +201,7 @@ class Analysis:
 
         for i in minima: 
             if i - 4 > 0: 
-                motif_stretch = data[i - 2 : i + 2]
+                motif_stretch = data[i - 1 : i + 1]
                 if np.all(motif_stretch < threshold): 
                     # Take the first value. 
                     pos_motif.append(motif_stretch[0])
@@ -273,7 +273,7 @@ def main():
 
     c.csv_writer("/home/nadzhou/Desktop/results.csv", cons_data)
     
-    # pos_motif, pos = c.find_motif(norm_data, minima, 4)
+    pos_motif, pos = c.find_motif(norm_data, minima, 4)
     
 
 

@@ -18,11 +18,12 @@ def xml_parser(in_file, out_file):
     """
     
     seqs = []
-    blast_records = SearchIO.read(in_file, "blast-xml")
-    for hsp in blast_records.hsps: 
-        print(hsp.hit)
-        seqs.append(hsp.hit)
-          
+    blast_records = list(SearchIO.parse(in_file, "blast-xml"))
+    for record in blast_records: 
+        for hsp in record.hsps: 
+            print(hsp.hit)
+            seqs.append(hsp.hit)
+            
     return SeqIO.write(seqs[:100], out_file, "fasta")
 
 
