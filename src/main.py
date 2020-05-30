@@ -12,17 +12,17 @@ from pathlib import Path
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-path = Path(("/home/nadzhou/Desktop/navid"))
+path = Path(("/home/nadzhou/Desktop/6x2c"))
 
 pdb_id = parse_arguments()
-# pdb_inst = StructSeqRetrieve(pdb_id, path)
-# print(pdb_inst.struct_retrieve())
-# print(pdb_inst.seq_extract())
+pdb_inst = StructSeqRetrieve(pdb_id, path)
+print(pdb_inst.struct_retrieve())
+print(pdb_inst.seq_extract())
 
-# psi_blaster(f"{path}/{pdb_id.id_input}.fasta", f"{path}/psi.xml")
+psi_blaster(f"{path}/{pdb_id.id_input}.fasta", f"{path}/psi.xml")
 
-# xml_parser(f"{path}/psi.xml", f"{path}/seqs.fasta")
-# msa(f"{path}/seqs.fasta", f"{path}/aligned_seq.fasta")
+xml_parser(f"{path}/psi.xml", f"{path}/seqs.fasta")
+msa(f"{path}/seqs.fasta", f"{path}/aligned_seq.fasta")
 
 seq = seq_extract(f"{path}/aligned_seq.fasta", "fasta")
 seq = [[x for x in y] for y in seq]
@@ -38,7 +38,7 @@ minima = c.find_local_minima(norm_data)
 norm_len = [x for x in range(len(norm_data))]
 pos_motif, pos = c.find_motif(norm_data, minima, 4)
 
-print(pos_motif)
+print(pos)
 # c.pymol_script_writer(f"{path}/mol.txt", pos)
 
 sns.lineplot(x=norm_len, y=norm_data)
