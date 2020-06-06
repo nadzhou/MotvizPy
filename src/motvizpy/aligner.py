@@ -22,7 +22,8 @@ def xml_parser(in_file, out_file):
     for record in blast_records: 
         for hsp in record.hsps: 
             print(hsp.hit)
-            seqs.append(hsp.hit)
+            if "virus" in hsp.hit.description: 
+                seqs.append(hsp.hit)
             
     return SeqIO.write(seqs[:100], out_file, "fasta")
 
