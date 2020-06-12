@@ -15,27 +15,6 @@ from Bio import AlignIO
 import re
 
 
-def seq_extract(in_file, file_ext): 
-    """Extrct the sequence from the fasta file
-    
-    Args: 
-        in_file [str]: Input file address
-        
-    Returns: 
-        seqs [1d list]: Protein sequences lisst
-        
-    """
-    if file_ext == "sth": 
-        file_ext = "stockholm"
-        
-    elif file_ext == "aln" or file_ext == "clustal": 
-        file_ext = "clustal"  
-         
-    alignment = AlignIO.read(in_file, file_ext)    
-    seqs = {i.id : str(i.seq) for i in alignment}
-
-    return seqs
-
 
 
 
@@ -58,11 +37,8 @@ class Analysis:
         """
         
         return np.asarray(self.seq, dtype='S1')
-
-
-
               
-    def __init__(self, seq, pdb_id): 
+    def __init__(self, seq): 
         """Initialize class Analysis. 
         
         Convert the 2d list to np array and make accessible
@@ -75,9 +51,6 @@ class Analysis:
             
         """   
         self.seq = seq
-        self.pdb_id = pdb_id
-
-
         
     def _shannon(self, array): 
         """Calculate Shannon Entropy vertically via loop. 
@@ -95,11 +68,9 @@ class Analysis:
         
         pA = 1
         for k, v in aa_count.items(): 
-            pA *= (v / 5)
+            pA *= (v / 21)
         
         return -np.sum(pA*np.log2(pA))
-
-
         
         
         
@@ -115,10 +86,7 @@ class Analysis:
             scores vertically into a float nd array   
         """
         
-        return np.apply_along_axis(self._shannon, 0, np_seq)  
-
-
-
+        return np.apply_along_axis(self._shannon, 0, np_seq)      
 
     def normalize_data(self, ent_list): 
         """Takes the entropy array and normalizes the data. 
@@ -133,8 +101,6 @@ class Analysis:
         
         return (2.*(ent_list - \
             np.min(ent_list))/np.ptp(ent_list)-1)       
-
-
         
     
     def find_local_minima(self, data): 
@@ -158,25 +124,6 @@ class Analysis:
                     polished_minima.append(j)
         
         return polished_minima
-
-
-
-
-    def moving_average(self, data, n=3) :
-        """Calculated the rolling average of teh data
-
-        Args: 
-            data [numpy nd array]: Float array of the conservation score calculated
-            n [int]: Rolling average wegith
-
-        Returns: 
-            avg_data [numpy nd array]: Float array of rolling average
-    
-        """
-        avg_data = np.cumsum(data, dtype=float)
-        avg_data[n:] = avg_data[n:] - avg_data[:-n]
-
-        return avg_data[n - 1:] / n
 
     def find_motif(self, data, minima, threshold): 
         """Given the minima and data, look for consecutive
@@ -208,9 +155,6 @@ class Analysis:
                     pos.append(i)
                        
         return (pos_motif, pos)
-
-
-
     
     def csv_writer(self, file, cons_data): 
         """Write the conservation data on a a CSV file
@@ -220,11 +164,14 @@ class Analysis:
             cons_data [dict]: Amino acid position as key and conservation value as value
             
         """
+        print(cons_data)
+        
         df = pd.DataFrame.from_dict(cons_data, orient="index")
         df.index.name = "Amino acid position"
         df.columns = ["Conservation score"]
         df.to_csv(file)
-    
+
+        
     def pymol_script_writer(self, out_file, pos): 
         """Motifs that are found are then written a txt file.
         Thhis is then run on PyMol by typing the following on terminal: 
@@ -244,17 +191,28 @@ class Analysis:
                 
             file.write("\nhide_all\n")
             file.write("\n")
+
             for i,_ in enumerate(pos): 
                 file.write(f"show cartoon, resi{pos[i]}\n")
+                
             file.write("\n")
             for i,_ in enumerate(pos): 
                 file.write(f"color red, mot{pos[i]}\n")
         
 
+def plotter(norm_data): 
+    norm_data_len = np.arange(1, len(norm_data) + 1)
+
+    fig = sns.lineplot(norm_data_len, norm_data)
+    plt.title("Conservation score per amino acid position")
+    plt.xlabel("Amino acid position")
+    plt.ylabel("Normalized conservation score")
+    return fig
+
 
 def main(): 
-    orig_file = Path("/home/nadzhou/Desktop/1yu5.fasta")
-    seq_dict = seq_extract("/home/nadzhou/Desktop/omega.aln", "clustal")
+    orig_file = Path("/home/nadzhou/Desktop/6x2c/6x2c.fasta")
+    seq_dict = seq_extract("/home/nadzhou/Desktop/6x2c/aligned_seq.fasta", "fasta")
     seq = [[x for x in y] for y in seq_dict.values()]
     c = Analysis(seq, "1xef")
 
@@ -264,17 +222,19 @@ def main():
     norm_data = c.normalize_data(c_ent)
 
 
-    norm_data = c.moving_average(norm_data)
+    #norm_data = c.moving_average(norm_data)
 
     norm_data_len = [i for i,_ in enumerate(norm_data)]
-    minima = c.find_local_minima(norm_data)
+    # minima = c.find_local_minima(norm_data)
 
-    cons_data = {num : data for num, data in zip(norm_data_len, norm_data)}
+    # cons_data = {num : data for num, data in zip(norm_data_len, norm_data)}
 
-    c.csv_writer("/home/nadzhou/Desktop/results.csv", cons_data)
+    # c.csv_writer("/home/nadzhou/Desktop/results.csv", cons_data)
     
-    pos_motif, pos = c.find_motif(norm_data, minima, 4)
     
+    fig = plotter(norm_data)
+
+    plt.show()
 
 
 

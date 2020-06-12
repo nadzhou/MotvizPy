@@ -19,11 +19,12 @@ import numpy as np
 def plotter(norm_data): 
     norm_data_len = np.arange(1, len(norm_data) + 1)
 
-    sns.lineplot(norm_data_len, norm_data)
+    fig = sns.lineplot(norm_data_len, norm_data)
     plt.title("Conservation score per amino acid position")
     plt.xlabel("Amino acid position")
     plt.ylabel("Normalized conservation score")
-    plt.show()
+    return fig
+
 
 def main(): 
     path = Path(("/home/nadzhou/Desktop/6x2c"))
@@ -38,10 +39,10 @@ def main():
     # xml_parser(f"{path}/psi.xml", f"{path}/seqs.fasta")
     # msa(f"{path}/seqs.fasta", f"{path}/aligned_seq.fasta")
 
-    seq = seq_extract(f"{path}/aligned_seq.fasta", "fasta")
+    seq = seq_extract("/home/nadzhou/Desktop/6x2c/aligned_seq.fasta", "fasta")
     seq = [[x for x in y] for y in seq]
 
-    c = Analysis(seq, pdb_id.id_input)
+    c = Analysis(seq)
     np_seq = c.seq2np()
 
     c_ent = c.conservation_score(np_seq)
@@ -49,7 +50,9 @@ def main():
 
     print(norm_data)
 
-    plotter(norm_data)
+    fig = plotter(norm_data)
+
+    plt.show()
 
 # c.pymol_script_writer(f"{path}/mol.txt", pos)
 
