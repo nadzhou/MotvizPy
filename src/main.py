@@ -6,7 +6,8 @@ from motvizpy.psiblast import psi_blaster
 from motvizpy.aligner import xml_parser
 from motvizpy.msa import msa
 
-from motvizpy.stats import seq_extract
+from motvizpy.read_write_seqs import extract_seq
+from motvizpy.read_write_seqs import write_seq
 from motvizpy.stats import Analysis
 from pathlib import Path
 
@@ -52,7 +53,7 @@ def seq_trimmer(in_file, out_file):
 
 
 def motif_finder(out_dir): 
-    seqs = seq_extract(f"{out_dir}/aligned_seq.fasta", "fasta")
+    seqs = extract_seq(f"{out_dir}/aligned_seq.fasta", "fasta")
     seq = [[x for x in y] for y in seqs]
 
     c = Analysis(seq)
@@ -69,20 +70,24 @@ def motif_finder(out_dir):
 
     plt.show()
 
+def struct_seq(pdb_id, out_dir): 
+    pdb_inst = StructSeqRetrieve(pdb_id, out_dir)
+    pdb_inst.struct_retrieve()
+    pdb_inst.replace_ent2pdb()
+    pdb_seq = extract_seq(out_dir / f"{pdb_id}.pdb", "pdb-seqres")
+    write_seq(pdb_seq, out_dir)
 
 
 def main(): 
     args = parse_arguments()
     pdb_id = args.id_input
-    out_dir = args.output_path
+    out_dir = Path(args.output_path)
 
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # pdb_inst = StructSeqRetrieve(args, out_dir)
-    # print(pdb_inst.struct_retrieve())
-    # print(pdb_inst.seq_extract())
-
+    struct_seq(pdb_id, out_dir)
+    
     # psi_blaster(f"{out_dir}/{args.id_input}.fasta", f"{out_dir}/psi.xml")
 
     # xml_parser(f"{out_dir}/psi.xml", f"{out_dir}/seqs.fasta")
