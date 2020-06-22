@@ -14,19 +14,18 @@ def psi_blaster(in_file, out_file):
         out_psi.xml [file]: Tell the user operation is done 
     
     """
-
-    iterations = ['-num_iterations', '5', '-sorthits', '3']
     
     in_file = str(in_file)
     print("Initiating PSI-BLAST...")
 
     cline = NcbipsiblastCommandline(query = in_file, outfmt = 5, 
                                 db = "refseq_protein.00", 
-                                out=out_file)
+                                num_iterations = 10,
+                                out=out_file
+                                )
 
     cmd = str(cline)
     cmd = cmd.split(" ")
-    cmd.extend(iterations)
 
     r = subprocess.Popen(cmd)
     

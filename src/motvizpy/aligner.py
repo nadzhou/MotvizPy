@@ -1,12 +1,9 @@
 #!/usr/bin/env python3.7
 
-from Bio import SeqIO
-from Bio.Blast import NCBIXML
 from Bio import SearchIO
-from Bio.Seq import Seq
-from Bio.SeqRecord import SeqRecord
+from typing import List
 
-def xml_parser(in_file): 
+def xml_parser(in_file: str) -> List: 
     """Parse the XML file and then give 
     out top 100 sequences into a fasta file. 
 

@@ -10,7 +10,6 @@ def write_seq(record: List, out_file: str) -> SeqRecord:
 
 
 def extract_seq(in_file: str, file_ext: str) -> List:        
-    alignment = SeqIO.parse(in_file, file_ext)    
-    seqs = [i.seq for i in alignment]
+    record = SeqIO.parse(in_file, file_ext)    
 
-    return seqs
+    return record   

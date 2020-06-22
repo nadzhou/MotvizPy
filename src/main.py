@@ -23,6 +23,31 @@ from Bio import AlignIO
 from Bio import SeqIO
 
 
+def main(): 
+    args = parse_arguments()
+    pdb_id = args.id_input
+    out_dir = Path(args.output_path)
+
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    struct_seq(pdb_id, out_dir)
+
+    psi_blaster(f"{out_dir}/{args.id_input}.fasta", f"{out_dir}/psi.xml")
+
+    psi_results = xml_parser(f"{out_dir}/psi.xml")
+    write_seq(psi_results, f"{out_dir}/seqs.fasta")
+
+    emboss_needle(f"{out_dir}/{pdb_id}.fasta",
+                     out_dir/"seqs.fasta", 
+                     f"{out_dir}/needle.fasta")
+
+    seq_trimmer(f"{out_dir}/needle.fasta",f"{out_dir}/trimmed_seqs.fasta")
+    msa(f"{out_dir}/trimmed_seqs.fasta", f"{out_dir}/aligned_seq.fasta")
+    
+    motif_finder(out_dir)
+
+
 def plotter(norm_data): 
     norm_data_len = np.arange(1, len(norm_data) + 1)
 
@@ -65,45 +90,17 @@ def motif_finder(out_dir):
     minima = c.find_local_minima(norm_data)
     pos_motif, pos = c.find_motif(norm_data, minima, threshold=-0.75)
 
-
     fig = plotter(norm_data)
 
     plt.show()
+
 
 def struct_seq(pdb_id, out_dir): 
     pdb_inst = StructSeqRetrieve(pdb_id, out_dir)
     pdb_inst.struct_retrieve()
     pdb_inst.replace_ent2pdb()
     pdb_seq = extract_seq(out_dir / f"{pdb_id}.pdb", "pdb-seqres")
-    write_seq(pdb_seq, out_dir)
-
-
-def main(): 
-    args = parse_arguments()
-    pdb_id = args.id_input
-    out_dir = Path(args.output_path)
-
-    out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-    struct_seq(pdb_id, out_dir)
-    
-    # psi_blaster(f"{out_dir}/{args.id_input}.fasta", f"{out_dir}/psi.xml")
-
-    # xml_parser(f"{out_dir}/psi.xml", f"{out_dir}/seqs.fasta")
-
-    # emboss_needle(f"{out_dir}/{pdb_id}.fasta",
-    #                  out_dir/"seqs.fasta", 
-    #                  f"{out_dir}/needle.fasta")
-
-    seq_trimmer(f"{out_dir}/needle.fasta",f"{out_dir}/trimmed_seqs.fasta")
-    msa(f"{out_dir}/trimmed_seqs.fasta", f"{out_dir}/aligned_seq.fasta")
-    
-    motif_finder(out_dir)
-
-
-# # c.pymol_script_writer(f"{out_dir}/mol.txt", pos)iden
-
+    write_seq(pdb_seq, out_dir / f"{pdb_id}.fasta")
 
 
 

@@ -28,10 +28,12 @@ def parse_arguments(parser=None):
     
     if not parser: 
         parser = ap.ArgumentParser()
+
     parser.add_argument("id_input", help="Input PDB ID")
     parser.add_argument("output_path", help="Path to output directory")
 
-    return parser
+    return parser.parse_args()
+
 
 class StructSeqRetrieve: 
     """Retrieve both PDB structure and then its sequence """
@@ -46,6 +48,7 @@ class StructSeqRetrieve:
         
         self.pdb_id = pdb_id
         self.out_dir = out_directory
+    
     
     def struct_retrieve(self): 
         """Retrieve the PDB structure from the terminal argument. 
