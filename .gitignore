@@ -1,0 +1,4 @@
+*.fasta 
+/obsolete/ 
+/__pycache__/
+/examples/

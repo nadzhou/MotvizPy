@@ -16,7 +16,7 @@ def msa(in_file, out_file):
     """
         
     clustalomega_cline = ClustalOmegaCommandline(infile=in_file, \
-                        outfile=out_file, verbose=True)
+                        outfile=out_file, verbose=True, force=True)
 
     cmd_str = str(clustalomega_cline).split(" ")
     cmd_str[0] = "./c"

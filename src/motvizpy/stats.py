@@ -15,16 +15,10 @@ from Bio import AlignIO
 import re
 
 
-
-
-
 class Analysis: 
     """Class will calculate conservation, visualize, and write PyMol script.
-    
-    Args: 
-        seq [1d list]: Sequences of amino acids from fasta file 
-    
     """  
+
     def seq2np(self): 
         """"Turn the sequence into numpy S1 array for calculations later. 
         
@@ -51,6 +45,7 @@ class Analysis:
             
         """   
         self.seq = seq
+        self.np_seq = self.seq2np()
         
     def _shannon(self, array): 
         """Calculate Shannon Entropy vertically via loop. 
@@ -64,17 +59,17 @@ class Analysis:
         """
         
         aa_count = Counter(array)
-        max_value = max(aa_count.values())
+        sum_aa_s = sum(aa_count.values())
         
         pA = 1
         for k, v in aa_count.items(): 
-            pA *= (v / 21)
+            pA *= (v / sum_aa_s)
         
-        return -np.sum(pA*np.log2(pA))
+        return -(np.sum(pA*np.log2(pA)))
         
         
         
-    def conservation_score(self, np_seq): 
+    def conservation_score(self): 
         """Calculate the Shannon Entropy vertically
         for each position in the amino acid msa sequence.
         
@@ -86,7 +81,7 @@ class Analysis:
             scores vertically into a float nd array   
         """
         
-        return np.apply_along_axis(self._shannon, 0, np_seq)      
+        return np.apply_along_axis(self._shannon, 0, self.np_seq)      
 
     def normalize_data(self, ent_list): 
         """Takes the entropy array and normalizes the data. 
@@ -146,14 +141,20 @@ class Analysis:
         pos_motif = []
         pos = []
 
-        for i in minima: 
-            if i - 4 > 0: 
-                motif_stretch = data[i - 1 : i + 1]
+
+        for i in minima:         
+            motif_checkpoint = 0
+            for stretch in range(10, 15): 
+                motif_stretch = data[i : i + stretch]
                 if np.all(motif_stretch < threshold): 
-                    # Take the first value. 
-                    pos_motif.append(motif_stretch[0])
-                    pos.append(i)
-                       
+                    # Take the first value.
+                    #print(f"motif: {motif_stretch[0]}") 
+                    motif_checkpoint = motif_stretch[0]
+            #print("checkpoint", motif_checkpoint)
+            if motif_checkpoint != 0: 
+                pos_motif.append(motif_checkpoint)
+                pos.append(i)
+                    
         return (pos_motif, pos)
     
     def csv_writer(self, file, cons_data): 
@@ -185,7 +186,7 @@ class Analysis:
         
         path = Path(out_file)
         with open(path, "w") as file: 
-            file.write(f"fetch {self.pdb_id}\n\n")
+            file.write("fetch 1fmw\n\n")
             for i,_ in enumerate(pos): 
                 file.write(f"create mot{pos[i]}, resi {pos[i]}-{pos[i]+4} \n")
                 

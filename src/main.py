@@ -15,6 +15,12 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
+from motvizpy.identical_sequence_parser import IdenticalSequencesParser
+from motvizpy.emboss import emboss_needle
+
+from Bio import AlignIO
+from Bio import SeqIO
+
 
 def plotter(norm_data): 
     norm_data_len = np.arange(1, len(norm_data) + 1)
@@ -26,21 +32,28 @@ def plotter(norm_data):
     return fig
 
 
-def main(): 
-    path = Path(("/home/nadzhou/Desktop/6x2c"))
+def seq_trimmer(in_file, out_file): 
+    needle_record = list(AlignIO.parse(in_file, "msf"))
 
-    pdb_id = parse_arguments()
-    # pdb_inst = StructSeqRetrieve(pdb_id, path)
-    # print(pdb_inst.struct_retrieve())
-    # print(pdb_inst.seq_extract())
+    result_record = []
 
-    # psi_blaster(f"{path}/{pdb_id.id_input}.fasta", f"{path}/psi.xml")
+    for rec in needle_record[1:]: 
+        reference_seq = rec[0]
 
-    # xml_parser(f"{path}/psi.xml", f"{path}/seqs.fasta")
-    # msa(f"{path}/seqs.fasta", f"{path}/aligned_seq.fasta")
+        seq_parser = IdenticalSequencesParser(reference_seq, rec[1])
 
-    seq = seq_extract("/home/nadzhou/Desktop/6x2c/aligned_seq.fasta", "fasta")
-    seq = [[x for x in y] for y in seq]
+
+        result = seq_parser.highly_identical_seqs()
+
+        if result:
+            result_record.append(result)
+
+        SeqIO.write(result_record, out_file, "fasta")
+
+
+def motif_finder(out_dir): 
+    seqs = seq_extract(f"{out_dir}/aligned_seq.fasta", "fasta")
+    seq = [[x for x in y] for y in seqs]
 
     c = Analysis(seq)
     np_seq = c.seq2np()
@@ -48,13 +61,43 @@ def main():
     c_ent = c.conservation_score(np_seq)
     norm_data = c.normalize_data(c_ent)
 
-    print(norm_data)
+    minima = c.find_local_minima(norm_data)
+    pos_motif, pos = c.find_motif(norm_data, minima, threshold=-0.75)
+
 
     fig = plotter(norm_data)
 
     plt.show()
 
-# c.pymol_script_writer(f"{path}/mol.txt", pos)
+
+
+def main(): 
+    args = parse_arguments()
+    pdb_id = args.id_input
+    out_dir = args.output_path
+
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
+    # pdb_inst = StructSeqRetrieve(args, out_dir)
+    # print(pdb_inst.struct_retrieve())
+    # print(pdb_inst.seq_extract())
+
+    # psi_blaster(f"{out_dir}/{args.id_input}.fasta", f"{out_dir}/psi.xml")
+
+    # xml_parser(f"{out_dir}/psi.xml", f"{out_dir}/seqs.fasta")
+
+    # emboss_needle(f"{out_dir}/{pdb_id}.fasta",
+    #                  out_dir/"seqs.fasta", 
+    #                  f"{out_dir}/needle.fasta")
+
+    seq_trimmer(f"{out_dir}/needle.fasta",f"{out_dir}/trimmed_seqs.fasta")
+    msa(f"{out_dir}/trimmed_seqs.fasta", f"{out_dir}/aligned_seq.fasta")
+    
+    motif_finder(out_dir)
+
+
+# # c.pymol_script_writer(f"{out_dir}/mol.txt", pos)iden
 
 
 

@@ -6,7 +6,7 @@ from Bio import SearchIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 
-def xml_parser(in_file, out_file): 
+def xml_parser(in_file): 
     """Parse the XML file and then give 
     out top 100 sequences into a fasta file. 
 
@@ -18,14 +18,12 @@ def xml_parser(in_file, out_file):
     """
     
     seqs = []
-    blast_records = list(SearchIO.parse(in_file, "blast-xml"))
-    for record in blast_records: 
-        for hsp in record.hsps: 
-            print(hsp.hit)
-            if "virus" in hsp.hit.description: 
-                seqs.append(hsp.hit)
-            
-    return SeqIO.write(seqs[:100], out_file, "fasta")
+    blast_records = SearchIO.parse(in_file, "blast-xml")
 
+    for records in blast_records: 
+        for record in records: 
+            for hsp in record.hsps: 
 
-    
+                seqs.append(hsp.hit)    
+                
+    return seqs

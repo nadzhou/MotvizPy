@@ -14,6 +14,8 @@ def psi_blaster(in_file, out_file):
         out_psi.xml [file]: Tell the user operation is done 
     
     """
+
+    iterations = ['-num_iterations', '5', '-sorthits', '3']
     
     in_file = str(in_file)
     print("Initiating PSI-BLAST...")
@@ -24,7 +26,8 @@ def psi_blaster(in_file, out_file):
 
     cmd = str(cline)
     cmd = cmd.split(" ")
-    cmd = list(cmd)
+    cmd.extend(iterations)
+
     r = subprocess.Popen(cmd)
     
     if r.communicate(): 

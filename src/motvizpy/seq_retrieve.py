@@ -1,10 +1,18 @@
-#!/usr/bin/env python3.7
-
 import argparse as ap 
 from Bio.PDB import PDBList
 from Bio.PDB import *
 from pathlib import Path
 from Bio import SeqIO
+
+
+def main(): 
+    parser = parse_arguments()
+
+    struct_seq = StructSeqRetrieve(parser.id_input, parser.output_path)
+
+    struct_seq.struct_retrieve()
+    struct_seq.replace_ent2pdb()
+    struct_seq.seq_extract()
 
 
 def parse_arguments(parser=None): 
@@ -21,14 +29,14 @@ def parse_arguments(parser=None):
     if not parser: 
         parser = ap.ArgumentParser()
     parser.add_argument("id_input", help="Input PDB ID")
-    args = parser.parse_args()
+    parser.add_argument("output_path", help="Path to output directory")
 
-    return args
+    return parser
 
 class StructSeqRetrieve: 
     """Retrieve both PDB structure and then its sequence """
     
-    def __init__(self, args, out_directory): 
+    def __init__(self, pdb_id, out_directory): 
         """Initialize the class StructSeqRetrieve
         
         Args: 
@@ -36,7 +44,7 @@ class StructSeqRetrieve:
             out_directory [str]: File path where the files should be written
         """
         
-        self.args = args
+        self.pdb_id = pdb_id
         self.out_dir = out_directory
     
     def struct_retrieve(self): 
@@ -50,34 +58,14 @@ class StructSeqRetrieve:
             
         """
         
-        pdb_id = self.args.id_input
         pdbl = PDBList()
-        ppb = PPBuilder()
+        pdbl.retrieve_pdb_file(self.pdb_id, file_format='pdb', pdir=self.out_dir)
+
+
+    def replace_ent2pdb(self): 
+        p = Path(f"{self.out_dir}/pdb{self.pdb_id}.ent")
+        p.replace(f'{self.out_dir}/{self.pdb_id}.pdb')
         
-        path = Path(self.out_dir)
 
-        pdbl.retrieve_pdb_file(pdb_id, file_format='pdb', pdir=path)
-        p = Path(f"{path}/pdb{pdb_id}.ent")
-        p.replace(f'{path}/{pdb_id}.pdb')
-        
-        return ("PDB file written.")
-
-    def seq_extract(self): 
-        """Extract the sequence from the given PDB file 
-        and write it to a fasta file. 
-        
-        Args: 
-            args [argparse object]: Take in the PDB ID
-            
-        Returns: 
-            prompt [str]: File written to directory. 
-            
-        """
-        
-        pdb_id = f"{self.out_dir}/{self.args.id_input}.pdb"
-
-        pdb_record = SeqIO.parse(pdb_id, "pdb-seqres")
-
-        SeqIO.write(pdb_record, f"{self.out_dir}/{self.args.id_input}.fasta", "fasta")
-
-        print("Fasta file written")
+if __name__ == '__main__': 
+    main()

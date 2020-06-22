@@ -1,0 +1,12 @@
+fetch 1fmw
+
+create mot2, resi 2-6 
+create mot4, resi 4-8 
+
+hide_all
+
+show cartoon, resi2
+show cartoon, resi4
+
+color red, mot2
+color red, mot4

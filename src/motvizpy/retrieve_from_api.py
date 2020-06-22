@@ -14,7 +14,6 @@ def retrieve_pdbs_from_api(uniprot_query_id):
         record [json]: result json object ready to be parsed
      
     """
-
     api_src = f"https://www.ebi.ac.uk/interpro/api/entry/interpro/"
 
     request_id = f"taxonomy/structure/pdb/protein/uniprot/{uniprot_query_id}"
@@ -48,7 +47,6 @@ def parse_api_results(json_record):
         
     
     """
-
     metadata_list = [i for i in json_record["results"] if "metadata" in i]
 
     found_ids = []
