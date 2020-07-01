@@ -1,8 +1,8 @@
-from Bio.Emboss.Applications import NeedleallCommandline
+from Bio.Emboss.Applications import WaterCommandline
 import subprocess
 
 
-def emboss_needle(seq_a_file: str, seq_b_file: str, out_file: str):
+def emboss_water(seq_a_file: str, seq_b_file: str, out_file: str):
     """ Do a global pairwise alignment using EMBOSS
 
         Args: 
@@ -14,7 +14,7 @@ def emboss_needle(seq_a_file: str, seq_b_file: str, out_file: str):
             r [subprocess object]: Execute the commandline command for EMBOSS
         
     """
-    needle_cline = NeedleallCommandline(asequence=seq_a_file,
+    needle_cline = WaterCommandline(asequence=seq_a_file,
                                         bsequence=seq_b_file,
                                         outfile=out_file,
                                         verbose=True,
@@ -36,7 +36,7 @@ def main():
     seq_b = "/home/nadzhou/SEQs/CoV/polished_seqs/gisaid5-6_polished.fasta"
     out_file = "/home/nadzhou/SEQs/needle.fasta"
 
-    emboss_needle(seq_a, seq_b, out_file)
+    emboss_water(seq_a, seq_b, out_file)
 
 
 if __name__ == '__main__':

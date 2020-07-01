@@ -20,7 +20,7 @@ def psi_blaster(in_file, out_file):
 
     cline = NcbipsiblastCommandline(query = in_file, outfmt = 5, 
                                 db = "refseq_protein.00", 
-                                num_iterations = 10,
+                                num_iterations = 3,
                                 out=out_file
                                 )
 

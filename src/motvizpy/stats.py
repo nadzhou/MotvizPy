@@ -3,97 +3,48 @@
 import numpy as np
 import pandas as pd
 from Bio import SeqIO
-import math
 
-import matplotlib.pyplot as plt
-import seaborn as sns
 from scipy.signal import argrelextrema
-
 from pathlib import Path
 from collections import Counter
-from Bio import AlignIO
-import re
+
+from typing import List, Dict, Sequence
 
 
 class Analysis: 
     """Class will calculate conservation, visualize, and write PyMol script.
     """  
 
-    def seq2np(self): 
-        """"Turn the sequence into numpy S1 array for calculations later. 
-        
-        Args: 
-            seq [2d list]: List of lists that contain sequences 
-        
-        Returns: 
-            np array [2d np array]: Np array that turns the chars into bytes
-            
-        """
-        
+    def seq2np(self) -> Sequence:     
         return np.asarray(self.seq, dtype='S1')
               
     def __init__(self, seq): 
-        """Initialize class Analysis. 
-        
-        Convert the 2d list to np array and make accessible
-        globally for other other functions. 
-        
-        Args: 
-            seq [list of lists]: 2d list of sequences
-            pdb_id [str]: PDB ID that will be written in the 
-                    final PyMol script file.  
-            
-        """   
         self.seq = seq
         self.np_seq = self.seq2np()
         
-    def _shannon(self, array): 
-        """Calculate Shannon Entropy vertically via loop. 
-        
-        Args: 
-            array [nd array]: 1d array of sequences from all the species
-        
-        Returns: 
-            entropy [nd float array]: Per column value for each position vertically
-        
+    def _shannon(self, array: List) -> Sequence: 
+        """Apply the Shannon Entropy for each vertical amino acid column
         """
         
         aa_count = Counter(array)
         sum_aa_s = sum(aa_count.values())
         
         pA = 1
-        for k, v in aa_count.items(): 
-            pA *= (v / sum_aa_s)
+        for aa, aa_freq in aa_count.items(): 
+            pA *= (aa_freq / sum_aa_s)
         
         return -(np.sum(pA*np.log2(pA)))
         
         
-        
-    def conservation_score(self): 
-        """Calculate the Shannon Entropy vertically
-        for each position in the amino acid msa sequence.
-        
-        Args: 
-            np_seq [Numpy nd array]: Np array of sequences
-            
-        Returns: 
-            np apply array [nd float array]: Calculate conservation 
-            scores vertically into a float nd array   
+    def conservation_score(self) -> Sequence: 
+        """Calculate the Shannon Entropy score. 
         """
-        
         return np.apply_along_axis(self._shannon, 0, self.np_seq)      
 
-    def normalize_data(self, ent_list): 
-        """Takes the entropy array and normalizes the data. 
-        
-        Args: 
-            ent_list [Nd array]: Entropy float array
-            
-        Returns: 
-            Normalized list [nd array]: Values between -1 and 1
-            
+
+    def normalize_data(self, ent_list: List[float]) -> List[float]: 
+        """Normalize the data between 1 and -1
         """
-        
         return (2.*(ent_list - \
             np.min(ent_list))/np.ptp(ent_list)-1)       
         
@@ -113,80 +64,48 @@ class Analysis:
         local_minima = argrelextrema(data, np.less)
         data_mean = np.mean(data)
         polished_minima = []
-        for i in local_minima: 
-            for j in i: 
-                if data[j] < data_mean: 
-                    polished_minima.append(j)
+
+        for local_minimum in local_minima: 
+            for value in local_minimum: 
+
+                if data[value] < data_mean: 
+                    polished_minima.append(value)
         
         return polished_minima
 
+
     def find_motif(self, data, minima, threshold): 
-        """Given the minima and data, look for consecutive
-        set (word size of 4) of values that are 1/4th of the mean. 
-        
-        Args; 
-            data [nd float array]: Normalized conservation daa
-            minima [1d list]: List of minima lower than the mean 
-            threshold [float]: Threshold value below which all 
-                consecutive values whill be taken up as motifs 
-                        
-        Returns: 
-            pos_motif [1d list]: Possible motifs that have 4 consecutive 
-                lower scores than 1/4th of the mean, only the 1st index. 
-                
-            pos [1d list]: Positions of these motifs.        
-             
+        """Find possible motifs in the given dataset            
         """
-        
-        pos_motif = []
+        pos_motif_values = []
         pos = []
 
-
-        for i in minima:         
+        for min_val in minima:         
             motif_checkpoint = 0
-            for stretch in range(10, 15): 
-                motif_stretch = data[i : i + stretch]
+
+            for stretch in range(10, 50): 
+                motif_stretch = data[min_val : min_val + stretch]
+
                 if np.all(motif_stretch < threshold): 
-                    # Take the first value.
-                    #print(f"motif: {motif_stretch[0]}") 
                     motif_checkpoint = motif_stretch[0]
+                    print(stretch)
+                    
             #print("checkpoint", motif_checkpoint)
             if motif_checkpoint != 0: 
-                pos_motif.append(motif_checkpoint)
-                pos.append(i)
+                pos_motif_values.append(motif_checkpoint)
+                pos.append(min_val)
                     
-        return (pos_motif, pos)
+        return (pos_motif_values, pos)
     
-    def csv_writer(self, file, cons_data): 
-        """Write the conservation data on a a CSV file
         
-        Args: 
-            file [str]: File path to where the data should be written
-            cons_data [dict]: Amino acid position as key and conservation value as value
-            
+    def pymol_script_writer(self, out_file: str, pos: List): 
+        """Write PyMol script for the given possibly important motifs   
         """
-        print(cons_data)
-        
-        df = pd.DataFrame.from_dict(cons_data, orient="index")
-        df.index.name = "Amino acid position"
-        df.columns = ["Conservation score"]
-        df.to_csv(file)
-
-        
-    def pymol_script_writer(self, out_file, pos): 
-        """Motifs that are found are then written a txt file.
-        Thhis is then run on PyMol by typing the following on terminal: 
-            @pymol_script.txt 
-        
-        Args: 
-            out_file [str]: Address for where the file should be written
-            pos [1d list]: Posiitons of the motifs as list
-            
-        """
-        
         path = Path(out_file)
+
         with open(path, "w") as file: 
             file.write("fetch 1fmw\n\n")
+
             for i,_ in enumerate(pos): 
                 file.write(f"create mot{pos[i]}, resi {pos[i]}-{pos[i]+4} \n")
                 
@@ -195,8 +114,8 @@ class Analysis:
 
             for i,_ in enumerate(pos): 
                 file.write(f"show cartoon, resi{pos[i]}\n")
-                
             file.write("\n")
+            
             for i,_ in enumerate(pos): 
                 file.write(f"color red, mot{pos[i]}\n")
         
@@ -242,3 +161,16 @@ def main():
 if __name__ == "__main__": 
     main()
 
+
+
+
+    # def csv_writer(self, file, cons_data): 
+    #     """Write CSV file 
+            
+    #     """
+    #     print(cons_data)
+        
+    #     df = pd.DataFrame.from_dict(cons_data, orient="index")
+    #     df.index.name = "Amino acid position"
+    #     df.columns = ["Conservation score"]
+    #     df.to_csv(file)

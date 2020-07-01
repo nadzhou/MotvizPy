@@ -1,5 +1,7 @@
 #!/usr/bin/env python3.7
 
+#!/usr/bin/env python
+
 from motvizpy.seq_retrieve import parse_arguments
 from motvizpy.seq_retrieve import StructSeqRetrieve
 from motvizpy.psiblast import psi_blaster
@@ -17,91 +19,120 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from motvizpy.identical_sequence_parser import IdenticalSequencesParser
-from motvizpy.emboss import emboss_needle
+from motvizpy.emboss import emboss_water
 
 from Bio import AlignIO
 from Bio import SeqIO
 
+from multiprocessing import Pool
+
+class Motviz: 
+    def __init__(self, args): 
+        self.pdb_id = args.id_input
+
+        self.out_dir = Path(args.output_path)
+        self.out_dir.mkdir(parents=True, exist_ok=True)
+
+        self._motifs = None
+    
+    def struct_extract(self): 
+        pdb_inst = StructSeqRetrieve(self.pdb_id, self.out_dir)
+        pdb_inst.struct_retrieve()
+        pdb_inst.replace_ent2pdb()
+
+
+    def pdb_seq_extract(self): 
+        pdb_seq = extract_seq(self.out_dir / f"{self.pdb_id}.pdb", "pdb-seqres")
+        write_seq(pdb_seq, self.out_dir / f"{self.pdb_id}.fasta")
+
+
+    def psi_blast(self): 
+        psi_blaster(self.out_dir / f"{self.pdb_id}.fasta", 
+                                    f"{self.out_dir}/psi.xml")
+
+    def parse_psi_xml(self): 
+        return xml_parser(self.out_dir / "psi.xml")
+
+    def water(self): 
+        emboss_water(self.out_dir / f"{self.pdb_id}.fasta",
+                     self.out_dir / "seqs.fasta", 
+                     self.out_dir / "water.fasta")
+
+    def seq_trimmer(self): 
+        needle_record = list(AlignIO.parse(self.out_dir / "water.fasta", "msf"))
+        self.result_record = []
+
+        for rec in needle_record[1:]: 
+            reference_seq = rec[0]
+            seq_parser = IdenticalSequencesParser(reference_seq, rec[1])
+
+            result = seq_parser.highly_identical_seqs()
+            if result:
+                self.result_record.append(result)
+
+
+    def clustalomega(self): 
+        msa(self.out_dir / "trimmed_seqs.fasta", 
+            self.out_dir / "aligned_seq.fasta")
+    
+
+    def motif_finder(self): 
+        seqs = extract_seq(self.out_dir / "aligned_seq.fasta", "fasta")
+        seq = [[x for x in y] for y in seqs]
+
+        c = Analysis(seq)
+
+        c_ent = c.conservation_score()
+        self.norm_data = c.normalize_data(c_ent)
+
+        minima = c.find_local_minima(self.norm_data)
+        pos_motif, pos = c.find_motif(self.norm_data, minima, threshold=-0.75)
+
+        print(f"Positions: {pos}")
+        print(f"Possible motifs: {pos_motif}")
+
+
+    def plotter(self): 
+        norm_data_len = np.arange(1, len(self.norm_data) + 1)
+
+        sns.lineplot(norm_data_len, self.norm_data)
+        plt.title(f"Conservation score per amino acid position for PDB ID {self.pdb_id}")
+        plt.xlabel("Amino acid position")
+        plt.ylabel("Normalized conservation score")
+        plt.show() 
+
+
+    def motifs(self): 
+        if self._motifs == None: 
+            # self.struct_extract()
+            # self.pdb_seq_extract()
+            # print("PDB structure and sequence fetching: done.")
+
+            # self.psi_blast()
+            # print("\nParsing PSI-BLAST results...")
+            # psi_results = self.parse_psi_xml()
+            # write_seq(psi_results, self.out_dir / "seqs.fasta")
+
+            # self.water()
+            self.seq_trimmer()
+
+            try:  
+                write_seq(self.result_record, 
+                        self.out_dir / "trimmed_seqs.fasta")
+
+                self.clustalomega()
+                self.motif_finder()
+                self.plotter()
+                plt.show()
+
+            except IOError as e: 
+                print("Could not find any meaningful target sequences.\nMotif finding failed: ", e)
+
 
 def main(): 
     args = parse_arguments()
-    pdb_id = args.id_input
-    out_dir = Path(args.output_path)
-
-    out_dir = Path(out_dir)
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-    struct_seq(pdb_id, out_dir)
-
-    psi_blaster(f"{out_dir}/{args.id_input}.fasta", f"{out_dir}/psi.xml")
-
-    psi_results = xml_parser(f"{out_dir}/psi.xml")
-    write_seq(psi_results, f"{out_dir}/seqs.fasta")
-
-    emboss_needle(f"{out_dir}/{pdb_id}.fasta",
-                     out_dir/"seqs.fasta", 
-                     f"{out_dir}/needle.fasta")
-
-    seq_trimmer(f"{out_dir}/needle.fasta",f"{out_dir}/trimmed_seqs.fasta")
-    msa(f"{out_dir}/trimmed_seqs.fasta", f"{out_dir}/aligned_seq.fasta")
-    
-    motif_finder(out_dir)
-
-
-def plotter(norm_data): 
-    norm_data_len = np.arange(1, len(norm_data) + 1)
-
-    fig = sns.lineplot(norm_data_len, norm_data)
-    plt.title("Conservation score per amino acid position")
-    plt.xlabel("Amino acid position")
-    plt.ylabel("Normalized conservation score")
-    return fig
-
-
-def seq_trimmer(in_file, out_file): 
-    needle_record = list(AlignIO.parse(in_file, "msf"))
-
-    result_record = []
-
-    for rec in needle_record[1:]: 
-        reference_seq = rec[0]
-
-        seq_parser = IdenticalSequencesParser(reference_seq, rec[1])
-
-
-        result = seq_parser.highly_identical_seqs()
-
-        if result:
-            result_record.append(result)
-
-        SeqIO.write(result_record, out_file, "fasta")
-
-
-def motif_finder(out_dir): 
-    seqs = extract_seq(f"{out_dir}/aligned_seq.fasta", "fasta")
-    seq = [[x for x in y] for y in seqs]
-
-    c = Analysis(seq)
-    np_seq = c.seq2np()
-
-    c_ent = c.conservation_score(np_seq)
-    norm_data = c.normalize_data(c_ent)
-
-    minima = c.find_local_minima(norm_data)
-    pos_motif, pos = c.find_motif(norm_data, minima, threshold=-0.75)
-
-    fig = plotter(norm_data)
-
-    plt.show()
-
-
-def struct_seq(pdb_id, out_dir): 
-    pdb_inst = StructSeqRetrieve(pdb_id, out_dir)
-    pdb_inst.struct_retrieve()
-    pdb_inst.replace_ent2pdb()
-    pdb_seq = extract_seq(out_dir / f"{pdb_id}.pdb", "pdb-seqres")
-    write_seq(pdb_seq, out_dir / f"{pdb_id}.fasta")
-
+    mot = Motviz(args)
+    mot.motifs()
 
 
 if __name__ == '__main__': 
