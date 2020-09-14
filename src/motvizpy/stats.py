@@ -83,13 +83,14 @@ class Analysis:
         for min_val in minima:         
             motif_checkpoint = 0
 
-            for stretch in range(10, 50): 
+            for stretch in range(6, 30): 
                 motif_stretch = data[min_val : min_val + stretch]
 
                 if np.all(motif_stretch < threshold): 
                     motif_checkpoint = motif_stretch[0]
-                    print(stretch)
-                    
+
+                print(f"Stretch of minimal values: {stretch}")  
+                
             #print("checkpoint", motif_checkpoint)
             if motif_checkpoint != 0: 
                 pos_motif_values.append(motif_checkpoint)

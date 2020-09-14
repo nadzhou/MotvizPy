@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.7
+par#!/usr/bin/env python3.7
 
 #!/usr/bin/env python
 
@@ -129,7 +129,7 @@ class Motviz:
                 print("Could not find any meaningful target sequences.\nMotif finding failed: ", e)
 
 
-def main(): 
+def main(): with
     args = parse_arguments()
     mot = Motviz(args)
     mot.motifs()

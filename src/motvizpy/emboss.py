@@ -1,4 +1,4 @@
-from Bio.Emboss.Applications import WaterCommandline
+aAafrom Bio.Emboss.Applications import WaterCommandline
 import subprocess
 
 

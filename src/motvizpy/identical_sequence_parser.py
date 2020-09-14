@@ -11,9 +11,10 @@ class IdenticalSequencesParser:
     """ Match reference sequence to target and calculate identity then write to file
     """
 
-    def __init__(self, ref_seq, tar_seq): 
+    def __init__(self, ref_seq, tar_seq, id_score): 
         self.ref_seq = ref_seq
         self.tar_seq = tar_seq
+        self.id_score_user_input = id_score
         
         self.ref_seq_len = len(self.ref_seq)
         self.np_seq = self.seqs2np()
@@ -70,16 +71,17 @@ class IdenticalSequencesParser:
             self.trimd_tar_seq = "".join(item for item in self.trimd_tar_seq)
 
             self.identity_score = np.true_divide(sum(self.identical_aa_freq), 
-                                                        self.ref_seq_len)
+                                                     self.ref_seq_len)
 
             return self.seq2record()
 
-    def set_identity_threshold(self): 
-        identity_checkpoint = 0
 
-        for identity in range(5, 20): 
-            identity *= 0.05
-            if self.identity_score > identity: 
+    def set_identity_threshold(self): 
+        identity_checkpoint = self.id_score_user_input
+
+        for identity in range(30, 5, -1): 
+            identity -= 0.05
+            if identity > self.identity_score: 
                 identity_checkpoint = identity
 
         return identity_checkpoint
@@ -92,12 +94,12 @@ class IdenticalSequencesParser:
         checkpoint = self.set_identity_threshold()
 
         if self.identity_score >= checkpoint and len(self.trimd_tar_seq) >= 0.5 * self.ref_seq_len:         
-            print(f"hit hit {self.identity_score}")
+            print(f"hit at identity score: {self.identity_score}")
 
             target_seq_record = SeqRecord(Seq(self.trimd_tar_seq),
-                                            id=self.tar_seq.id,
-                                            name=self.tar_seq.name,
-                                            description=self.tar_seq.description)
+                                              id=self.tar_seq.id,
+                                              name=self.tar_seq.name,
+                                              description=self.tar_seq.description)
 
             return target_seq_record
 
