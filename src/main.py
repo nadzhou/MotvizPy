@@ -81,7 +81,7 @@ class Motviz:
         seqs = extract_seq(self.out_dir / "aligned_seq.fasta", "fasta")
         seq = [[x for x in y] for y in seqs]
 
-        c =                                                                                                                                                                                                                                                                                                                                                             (seq)
+        c =  Analysis(seq)                                                                                                                                                                                                                                                                                                                                                           (seq)
 
         self.c_ent = c.conservation_score()
         self.norm_data = c.normalize_data(self.c_ent)
