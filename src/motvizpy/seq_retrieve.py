@@ -29,8 +29,16 @@ def parse_arguments(parser=None):
     if not parser: 
         parser = ap.ArgumentParser()
 
-    parser.add_argument("id_input", help="Input PDB ID")
-    parser.add_argument("output_path", help="Path to output directory")
+    parser.add_argument("id_input", 
+                        help="Input PDB ID")
+
+    parser.add_argument("output_path", 
+                        help="Path to output directory")
+
+    parser.add_argument('--idscore', 
+                        type=float, 
+                        default=0.7, 
+                        help="Input identity score for trimming of the sequences")
 
     return parser.parse_args()
 

@@ -20,13 +20,8 @@ def msa(in_file, out_file):
 
     cmd_str = str(clustalomega_cline).split(" ")
     cmd_str[0] = "./c"
-    print(cmd_str)
-
-    r = subprocess.Popen(cmd_str)
-    if (r.communicate()): 
-        return (f"\n Clustal Omega done\nFile written at {out_file}\n")
-
-
+    
+    return subprocess.run(cmd_str, check=True)
 
 
 

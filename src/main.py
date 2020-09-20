@@ -25,6 +25,7 @@ from Bio import AlignIO
 from Bio import SeqIO
 
 from multiprocessing import Pool
+from scipy.signal import argrelextrema
 
 class Motviz: 
     def __init__(self, args): 
@@ -81,18 +82,20 @@ class Motviz:
         seqs = extract_seq(self.out_dir / "aligned_seq.fasta", "fasta")
         seq = [[x for x in y] for y in seqs]
 
-        c =  Analysis(seq)                                                                                                                                                                                                                                                                                                                                                           (seq)
-
+        c = Analysis(seq)
         self.c_ent = c.conservation_score()
         self.norm_data = c.normalize_data(self.c_ent)
 
         minima = c.find_local_minima(self.norm_data)
-        pos_motif, pos = c.find_motif(self.norm_data, minima, threshold=-0.75)
+        conserved_posits = c.find_motif(self.norm_data, minima, threshold=-0.75)
 
-        print(f"Positions: {pos}")
-        print(f"Possible motifs: {pos_motif}")
+        print(f"Conserved positions: {conserved_posits}")
 
-        c.pymol_script_writer(self.out_dir / f"{self.pdb_id}_pymol.txt", pos)
+        c.pymol_script_writer(self.out_dir / f"{self.pdb_id}_pymol.txt", conserved_posits)
+
+        local_maxima = argrelextrema(c.find_conservation(), np.greater)
+
+        sns.barplot(c.find_conservation(), np.arange(1, len(c.find_conservation()) + 1))
 
 
     def plotter(self): 

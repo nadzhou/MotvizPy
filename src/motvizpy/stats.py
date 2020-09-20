@@ -36,7 +36,7 @@ class Analysis:
         return -(np.sum(pA*np.log2(pA)))
         
         
-    def conservation_score(self) -> Sequence: 
+    def conservation_score(self) -> Sequence:       
         """Calculate the Shannon Entropy score. 
         """
         return np.apply_along_axis(self._shannon, 0, self.np_seq)      
@@ -77,26 +77,21 @@ class Analysis:
     def find_motif(self, data, minima, threshold): 
         """Find possible motifs in the given dataset            
         """
-        pos_motif_values = []
-        pos = []
+        conserved_posits = {}
 
         for min_val in minima:         
-            motif_checkpoint = 0
 
             for stretch in range(6, 30): 
+
                 motif_stretch = data[min_val : min_val + stretch]
 
                 if np.all(motif_stretch < threshold): 
-                    motif_checkpoint = motif_stretch[0]
+                    conserved_posits[min_val] = min_val + stretch
 
-                print(f"Stretch of minimal values: {stretch}")  
-                
-            #print("checkpoint", motif_checkpoint)
-            if motif_checkpoint != 0: 
-                pos_motif_values.append(motif_checkpoint)
-                pos.append(min_val)
+                print(f"Maximum stretch of amino acids: {stretch}")
+
                     
-        return (pos_motif_values, pos)
+        return conserved_posits
     
         
     def pymol_script_writer(self, out_file: str, pos: List): 
@@ -107,19 +102,37 @@ class Analysis:
         with open(path, "w") as file: 
             file.write("fetch 1fmw\n\n")
 
-            for i,_ in enumerate(pos): 
-                file.write(f"create mot{pos[i]}, resi {pos[i]}-{pos[i]+4} \n")
+            for motif_start, motif_end in pos.items():  
+                file.write(f"create mot{motif_start}, resi {motif_start}-{motif_end} \n")
                 
             file.write("\nhide_all\n")
             file.write("\n")
 
-            for i,_ in enumerate(pos): 
-                file.write(f"show cartoon, resi{pos[i]}\n")
+            for motif_start, motif_end in pos.items():  
+                file.write(f"show cartoon, resi{motif_start}\n")
             file.write("\n")
             
-            for i,_ in enumerate(pos): 
-                file.write(f"color red, mot{pos[i]}\n")
+            for motif_start, motif_end in pos.items():  
+                file.write(f"color red, mot{motif_start}\n")
+
         
+
+    def find_conservation(self): 
+        return np.apply_along_axis(self._find_conservation_depth, 0, self.np_seq)
+
+
+    def _find_conservation_depth(self, array): 
+        unique_aas, aa_counts = np.unique(array, return_counts=True)
+
+        aa_frequency_dict = dict(zip(unique_aas, aa_counts))
+
+        most_conserved_aa = np.max(aa_counts)
+
+        for aa, aa_count in aa_frequency_dict.items(): 
+            if aa_count == most_conserved_aa: 
+
+                return aa_count / sum(aa_counts)
+
 
 def plotter(norm_data): 
     norm_data_len = np.arange(1, len(norm_data) + 1)

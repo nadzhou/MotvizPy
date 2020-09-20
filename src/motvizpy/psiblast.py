@@ -27,8 +27,4 @@ def psi_blaster(in_file, out_file):
     cmd = str(cline)
     cmd = cmd.split(" ")
 
-    r = subprocess.Popen(cmd)
-    
-    if r.communicate(): 
-        return ("PSI-BLAST done. File written {out_file}")
-        
+    return subprocess.run(cmd, check=True)

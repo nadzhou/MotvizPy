@@ -1,4 +1,4 @@
-aAafrom Bio.Emboss.Applications import WaterCommandline
+from Bio.Emboss.Applications import WaterCommandline
 import subprocess
 
 
@@ -24,11 +24,8 @@ def emboss_water(seq_a_file: str, seq_b_file: str, out_file: str):
     cmd = str(needle_cline)
     cmd = cmd.split(" ")
     cmd.append("-aformat=msf")
-    print(cmd)
 
-    r = subprocess.Popen(cmd)
-    if r.communicate():
-        print("Global alignment done.")
+    return subprocess.run(cmd, check=True)
 
 
 def main():
