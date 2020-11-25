@@ -54,9 +54,9 @@ class StructSeqRetrieve:
             out_directory [str]: File path where the files should be written
         """
         
-        self.pdb_id = pdb_id
-        self.out_dir = out_directory
-    
+        self.pdb_id = pdb_id.lower()
+        self.out_dir = Path(out_directory)
+        print(self.out_dir)
     
     def struct_retrieve(self): 
         """Retrieve the PDB structure from the terminal argument. 
@@ -74,9 +74,9 @@ class StructSeqRetrieve:
 
 
     def replace_ent2pdb(self): 
-        p = Path(f"{self.out_dir}/pdb{self.pdb_id}.ent")
-        p.replace(f'{self.out_dir}/{self.pdb_id}.pdb')
+        p = self.out_dir / f"pdb{self.pdb_id}.ent"
+        p.replace(self.out_dir / f'{self.pdb_id}.pdb')
         
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
     main()

@@ -33,7 +33,7 @@ class Analysis:
         for aa, aa_freq in aa_count.items(): 
             pA *= (aa_freq / sum_aa_s)
         
-        return -(np.sum(pA*np.log2(pA)))
+        return -(np.sum(pA * np.log2(pA)))
         
         
     def conservation_score(self) -> Sequence:       
@@ -116,7 +116,6 @@ class Analysis:
                 file.write(f"color red, mot{motif_start}\n")
 
         
-
     def find_conservation(self): 
         return np.apply_along_axis(self._find_conservation_depth, 0, self.np_seq)
 

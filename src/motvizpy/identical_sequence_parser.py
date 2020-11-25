@@ -11,7 +11,7 @@ class IdenticalSequencesParser:
     """ Match reference sequence to target and calculate identity then write to file
     """
 
-    def __init__(self, ref_seq, tar_seq, id_score): 
+    def __init__(self, ref_seq, tar_seq, id_score=0.7): 
         self.ref_seq = ref_seq
         self.tar_seq = tar_seq
         self.id_score = id_score
@@ -77,12 +77,13 @@ class IdenticalSequencesParser:
 
 
     def set_identity_threshold(self): 
-        identity_checkpoint = self.id_score
+        identity_checkpoint = 0
 
         for identity in range(5, 20): 
-            identity *= 0.05
-            if self.identity_score > identity: 
-                identity_checkpoint = identity
+            self.id_score *= 0.05
+            identity += 0.05
+            if self.identity_score > self.id_score: 
+                identity_checkpoint = self.id_score
 
         return identity_checkpoint
             
