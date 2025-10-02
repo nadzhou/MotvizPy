@@ -52,4 +52,4 @@ Here is the workflow for the tool:
 
 [2]. https://www.sciencedirect.com/science/article/pii/S1567134811003236
 
-This project will be further developed in the future and will hopefully be in Rust
+This project will be further developed in the future and will hopefully be in Rust or C++.
